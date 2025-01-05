@@ -1,0 +1,54 @@
+.heroImage {
+  width: 100%;
+  height: 40vh;
+  background-image: url('./Food\ (2).png');
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.heroContent {
+  max-width: 80%;
+  text-align: center;
+  color: white;
+  position: absolute;
+  z-index: 1;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.search-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.searchBar {
+  width: 50%;
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 25px;
+  border: 2px solid #fff;
+  background-color: rgba(255, 255, 255, 0.7);
+  max-width: 500px;
+  box-sizing: border-box;
+}
+
+.searchButton {
+  padding: 12px;
+  font-size: 16px;
+  margin-left: 10px;
+  border-radius: 25px;
+  border: none;
+  background-color: #fff;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.searchButton:hover {
+  background-color: #ddd;
+}

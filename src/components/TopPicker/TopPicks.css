@@ -1,0 +1,60 @@
+.top-picks-container {
+    padding: 40px 20px;
+    background-color: #fff8f1;
+    text-align: center;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .top-picks-container h2 {
+    font-size: 28px;
+    margin-bottom: 10px;
+    color: #333;
+  }
+  
+  .top-picks-subtitle {
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 20px;
+  }
+  
+  .top-picks-grid {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  
+  .top-picks-card {
+    background-color: #fff;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    width: 280px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .top-picks-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
+  
+  .top-picks-image {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+  }
+  
+  .top-picks-card h3 {
+    font-size: 20px;
+    margin: 10px 0 5px;
+    color: #333;
+  }
+  
+  .top-picks-card p {
+    font-size: 14px;
+    color: #777;
+    padding: 0 10px 15px;
+  }
+  

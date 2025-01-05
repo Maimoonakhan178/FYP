@@ -1,0 +1,52 @@
+body {
+  margin: 0;
+  font-family: "Arial", sans-serif;
+}
+
+.App {
+  text-align: center;
+}
+
+.header h2 {
+  margin: 20px;
+  font-size: 18px;
+  font-weight: bold;
+  color: white;
+}
+
+.hero-section {
+  position: relative;
+  height: 100vh;
+  background-image: url("./bg.jpg");
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hero-section .overlay {
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  padding: 50px;
+  text-align: center;
+}
+
+.hero-section h1 {
+  font-size: 3em;
+  font-weight: bold;
+}
+
+.recommendation-btn {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: white;
+  color: black;
+  border: none;
+  cursor: pointer;
+}
+
+.recommendation-btn:hover {
+  background-color: lightgray;
+}
