@@ -9,6 +9,9 @@ import RecentActivity from "./components/Recent activity/RecentActivity";
 import RestaurantCardSection from "./components/Restaurant Card Section/RestaurantCardSection";
 import NewsletterSubscribe from "./components/Newsletter/NewsletterSubscribe";
 import TopPicks from "./components/TopPicker/TopPicks";
+import Blog from './components/blog/blog';  
+import Question from './components/question/question';  
+import Restaurant from './components/question/karachirestaurant';  
 
 const App = () => {
   const [searchQuery, setSearchQuery] = useState(""); // Tracks the search query
@@ -45,6 +48,9 @@ const App = () => {
               )}
               <RecentActivity />
               <TopPicks />
+              <Blog/>
+              <Question/> 
+              <Restaurant/>
               <NewsletterSubscribe />
               <Footer />
             </div>
@@ -53,6 +59,7 @@ const App = () => {
         {/* Redirect unknown routes to /signup */}
         <Route path="*" element={<Navigate to="/signup" />} />
       </Routes>
+
     </Router>
   );
 };
