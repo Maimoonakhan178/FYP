@@ -4,6 +4,7 @@ import Logo from "./Logo.webp";
 import "./Header.css";
 import { Button } from "@mui/material";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
+import WriteReview from "./writeareview";  // Import WriteReview component
 
 const Header = () => {
   const [showModal, setShowModal] = useState(false);
@@ -40,17 +41,14 @@ const Header = () => {
 
         {/* Navigation Links */}
         <nav className="navbar-nav me-auto mb-2 mb-lg-0">
-          <a className="nav-link" href="/restaurants">
+          <a className="nav-link" href="/restaurant">
             Restaurants
           </a>
-          <a className="nav-link" href="/home-services">
-            Home Services
+          <a className="nav-link" href="/blog">
+            Blog
           </a>
-          <a className="nav-link" href="/auto-services">
-            Auto Services
-          </a>
-          <a className="nav-link" href="/more">
-            More
+          <a className="nav-link" href="/survey">
+            Survey
           </a>
         </nav>
 
@@ -96,7 +94,7 @@ const Header = () => {
         </div>
       </div>
 
-      {/* Modal Pop-Up */}
+      {/* Modal Pop-Up for Write a Review */}
       {showModal && (
         <div
           className="modal show"
@@ -118,27 +116,7 @@ const Header = () => {
                 ></button>
               </div>
               <div className="modal-body">
-                <form>
-                  <div className="mb-3">
-                    <label htmlFor="reviewTitle" className="form-label">
-                      Review Title
-                    </label>
-                    <input type="text" className="form-control" id="reviewTitle" />
-                  </div>
-                  <div className="mb-3">
-                    <label htmlFor="reviewBody" className="form-label">
-                      Review
-                    </label>
-                    <textarea
-                      className="form-control"
-                      id="reviewBody"
-                      rows="4"
-                    ></textarea>
-                  </div>
-                  <button type="submit" className="btn btn-primary">
-                    Submit
-                  </button>
-                </form>
+                <WriteReview onSubmitReview={(reviewData) => console.log("Review submitted:", reviewData)} />
               </div>
             </div>
           </div>

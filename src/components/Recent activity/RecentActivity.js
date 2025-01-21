@@ -11,6 +11,7 @@ import bgImage7 from "./r (7).jpg";
 
 const RecentActivity = () => {
   const [selectedActivity, setSelectedActivity] = useState(null);
+  const [showAll, setShowAll] = useState(false); // Track whether to show all activities
 
   const activities = [
     {
@@ -105,11 +106,17 @@ const RecentActivity = () => {
     setSelectedActivity(null);
   };
 
+  const toggleShowAll = () => {
+    setShowAll(!showAll);
+  };
+
+  const displayedActivities = showAll ? activities : activities.slice(0, 6);
+
   return (
     <div className="recent-activity">
       <h2>Recent Activity</h2>
       <div className="activity-cards">
-        {activities.map((activity, index) => (
+        {displayedActivities.map((activity, index) => (
           <div
             className="activity-card"
             key={index}
@@ -137,6 +144,13 @@ const RecentActivity = () => {
           </div>
         ))}
       </div>
+
+      {/* Show More Button */}
+      {activities.length > 6 && !showAll && (
+        <button className="btn btn-primary" onClick={toggleShowAll}>
+          Show More
+        </button>
+      )}
 
       {/* Popup Modal */}
       {selectedActivity && (

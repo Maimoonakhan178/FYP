@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import Lottie from 'react-lottie';
 import animationData from './Animation.json';
 import './Footer.css';
+import WriteReview from '../Header/writeareview'; // Corrected path based on your folder structure
 
 const Footer = () => {
-  const [isReviewPopupOpen, setIsReviewPopupOpen] = useState(false); // Popup visibility
-  const [reviewText, setReviewText] = useState(''); // Review text state
+  const [isReviewPopupOpen, setIsReviewPopupOpen] = useState(false);
 
   const defaultOptions = {
     loop: true,
@@ -24,37 +24,13 @@ const Footer = () => {
   // Close Review Popup
   const closeReviewPopup = () => {
     setIsReviewPopupOpen(false);
-    setReviewText('');
   };
 
   // Handle Review Submission
-  const handleReviewSubmit = async () => {
-    if (!reviewText.trim()) {
-      alert('Please enter a review before submitting.');
-      return;
-    }
-
-    try {
-      const response = await fetch('http://localhost:5000/api/reviews', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ review: reviewText }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to save the review');
-      }
-
-      const data = await response.json();
-      console.log('Review saved successfully:', data);
-      alert('Your review has been submitted successfully!');
-      closeReviewPopup();
-    } catch (error) {
-      console.error('Error:', error);
-      alert('Failed to submit the review. Please try again later.');
-    }
+  const handleReviewSubmit = (reviewData) => {
+    console.log('Review submitted:', reviewData);
+    alert('Your review has been submitted successfully!');
+    closeReviewPopup();
   };
 
   return (
@@ -96,24 +72,14 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* Review Popup */}
+      {/* Render Review Popup */}
       {isReviewPopupOpen && (
         <div className="popup-overlay" onClick={closeReviewPopup}>
-          <div className="popup-content" onClick={(e) => e.stopPropagation()}>
-            <button className="popup-close" onClick={closeReviewPopup}>
-              ✖
-            </button>
-            <h2>Write a Review</h2>
-            <textarea
-              value={reviewText}
-              onChange={(e) => setReviewText(e.target.value)}
-              placeholder="Share your thoughts..."
-              rows="5"
-              style={{ width: '100%', margin: '10px 0', padding: '10px' }}
-            ></textarea>
-            <button onClick={handleReviewSubmit} className="popup-submit">
-              Submit Review
-            </button>
+          <div className="popup-container" onClick={(e) => e.stopPropagation()}>
+            <WriteReview
+              onSubmitReview={handleReviewSubmit}
+              onClose={closeReviewPopup}
+            />
           </div>
         </div>
       )}

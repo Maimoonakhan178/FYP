@@ -9,9 +9,7 @@ import RecentActivity from "./components/Recent activity/RecentActivity";
 import RestaurantCardSection from "./components/Restaurant Card Section/RestaurantCardSection";
 import NewsletterSubscribe from "./components/Newsletter/NewsletterSubscribe";
 import TopPicks from "./components/TopPicker/TopPicks";
-import Blog from './components/blog/blog';  
-import Question from './components/question/question';  
-import Restaurant from './components/question/karachirestaurant';  
+import Blog from "./components/blog/blog";
 
 const App = () => {
   const [searchQuery, setSearchQuery] = useState(""); // Tracks the search query
@@ -29,6 +27,8 @@ const App = () => {
         <Route path="/signup" element={<Signup />} />
         {/* Login Page */}
         <Route path="/login" element={<Login />} />
+        {/* Main Website */}
+        <Route path="/blog" element={<Blog />} />
         {/* Main Website */}
         <Route
           path="/"
@@ -48,9 +48,6 @@ const App = () => {
               )}
               <RecentActivity />
               <TopPicks />
-              <Blog/>
-              <Question/> 
-              <Restaurant/>
               <NewsletterSubscribe />
               <Footer />
             </div>
