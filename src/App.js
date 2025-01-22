@@ -9,9 +9,22 @@ import RecentActivity from "./components/Recent activity/RecentActivity";
 import RestaurantCardSection from "./components/Restaurant Card Section/RestaurantCardSection";
 import NewsletterSubscribe from "./components/Newsletter/NewsletterSubscribe";
 import TopPicks from "./components/TopPicker/TopPicks";
-import Blog from './components/blog/blog';  
-import Question from './components/question/question';  
-import Restaurant from './components/question/karachirestaurant';  
+import Blog from "./components/blog/blog";
+
+// Helper function to check authentication
+const isAuthenticated = () => !!localStorage.getItem('user');
+
+// ProtectedRoute component to protect routes and include Header
+const ProtectedRoute = ({ children }) => {
+  return isAuthenticated() ? (
+    <>
+      <Header /> {/* Only render Header if authenticated */}
+      {children} {/* Render children (protected routes) */}
+    </>
+  ) : (
+    <Navigate to="/login" /> // Redirect to login if not authenticated
+  );
+};
 
 const App = () => {
   const [searchQuery, setSearchQuery] = useState(""); // Tracks the search query
@@ -25,41 +38,39 @@ const App = () => {
   return (
     <Router>
       <Routes>
-        {/* Signup Page */}
+        {/* Public Routes */}
         <Route path="/signup" element={<Signup />} />
-        {/* Login Page */}
         <Route path="/login" element={<Login />} />
-        {/* Main Website */}
+
+        {/* Protected Routes */}
         <Route
           path="/"
           element={
-            <div>
-              <Header />
-              <HeroSection onSearch={handleSearch} />
-              {hasSearched ? (
-                <RestaurantCardSection searchQuery={searchQuery} />
-              ) : (
-                <>
+            <ProtectedRoute>
+              <div>
+                <HeroSection onSearch={handleSearch} />
+                {hasSearched ? (
+                  <RestaurantCardSection searchQuery={searchQuery} />
+                ) : (
                   <p style={{ textAlign: "center", margin: "20px 0", fontSize: "18px" }}>
                     Use the search bar above to recommend restaurants.
                   </p>
-                  <RestaurantCardSection searchQuery="" />
-                </>
-              )}
-              <RecentActivity />
-              <TopPicks />
-              <Blog/>
-              <Question/> 
-              <Restaurant/>
-              <NewsletterSubscribe />
-              <Footer />
-            </div>
+                )}
+                <RecentActivity />
+                <TopPicks />
+                <NewsletterSubscribe />
+                <Footer />
+              </div>
+            </ProtectedRoute>
           }
         />
+
+        {/* Blog Page */}
+        <Route path="/blog" element={<Blog />} />
+
         {/* Redirect unknown routes to /signup */}
         <Route path="*" element={<Navigate to="/signup" />} />
       </Routes>
-
     </Router>
   );
 };
