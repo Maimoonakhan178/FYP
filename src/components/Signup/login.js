@@ -9,8 +9,8 @@ const FoodieLoginPage = () => {
   });
 
   const [error, setError] = useState('');
-  const [timeSpent, setTimeSpent] = useState(0);  // Store the time spent
-  const [clicks, setClicks] = useState([]);       // Store click positions
+  const [timeSpent, setTimeSpent] = useState(0); // Store the time spent
+  const [clicks, setClicks] = useState([]); // Store click positions
 
   // Track how much time user spends on the page
   useEffect(() => {
@@ -18,7 +18,7 @@ const FoodieLoginPage = () => {
 
     return () => {
       const endTime = Date.now();
-      setTimeSpent((prevTime) => prevTime + Math.floor((endTime - startTime) / 1000));  // Store time in seconds
+      setTimeSpent((prevTime) => prevTime + Math.floor((endTime - startTime) / 1000)); // Store time in seconds
     };
   }, []);
 
@@ -45,18 +45,41 @@ const FoodieLoginPage = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError(''); // Reset error message
 
-    if (formData.email === 'user@example.com' && formData.password === 'password') {
-      console.log('Login successful:', formData);
-      console.log('Time Spent on Page:', timeSpent, 'seconds');
-      console.log('Clicks:', clicks);  // Log the positions where user clicked
-    } else {
-      setError('Invalid email or password');
+    try {
+      // Create a new FormData object
+      const form = new FormData();
+      form.append('email', formData.email); // Add email to form
+      form.append('password', formData.password); // Add password to form
+
+      const response = await fetch('http://127.0.0.1:5000/api/signin', {
+        method: 'POST',
+        body: form, // Send FormData
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Store email in localStorage
+        localStorage.setItem('user', JSON.stringify({ email:formData.email, name: data.name }));
+
+        console.log('Login successful:', data);
+        console.log('Time Spent on Page:', timeSpent, 'seconds');
+        console.log('Clicks:', clicks); // Log the positions where the user clicked
+
+        // Redirect or show success message
+        window.location.href = '/';
+      } else {
+        setError(data.message || 'Login failed. Please try again.');
+      }
+    } catch (error) {
+      setError('An error occurred while logging in. Please try again.');
     }
   };
+  
 
   const defaultOptions = {
     loop: true,
