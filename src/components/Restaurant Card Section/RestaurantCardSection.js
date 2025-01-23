@@ -8,7 +8,7 @@ import bgImage4 from "./bk.jpg";
 import bgImage5 from "./delight.jpg"; 
 //import CardActions from '@mui/material/CardActions';
 // or
-import { CardActions } from '@mui/material';
+// import { CardActions } from '@mui/material';
 
 // Mock data for restaurants
 const restaurantData = {
@@ -30,26 +30,46 @@ const restaurantData = {
 
 
 const RestaurantCardSection = ({ searchQuery }) => {
+  const user = JSON.parse(localStorage.getItem("user"));
   const [filteredRestaurants, setFilteredRestaurants] = useState([]);
 
   useEffect(() => {
-    const sanitizedSearchQuery = searchQuery?.toLowerCase() || "";
-    let filtered = [];
+    const fetchData = async () => {
+      let sanitizedSearchQuery = searchQuery?.toLowerCase() || "";
+      let filtered = [];
+      sanitizedSearchQuery+=" at location of "+ user.location;
+      console.log(sanitizedSearchQuery);
+      try {
+        // Create a new FormData object
+        const form = new FormData();
+        form.append('query', sanitizedSearchQuery); // Add query to form
 
-    // Filter restaurants based on search query
-    if (sanitizedSearchQuery.includes("biryani")) {
-      filtered = restaurantData.biryani;
-    } else if (sanitizedSearchQuery.includes("burger")) {
-      filtered = restaurantData.burger;
-    } else if (sanitizedSearchQuery.includes("top 10")) {
-      filtered = restaurantData.topRestaurants;
-    } else if (!sanitizedSearchQuery) {
-      // If no query, show nothing
-      filtered = [];
+        // Send the POST request
+        const response = await fetch('http://127.0.0.1:5000/api/search', {
+          method: 'POST',
+          body: form,
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          filtered = data.results;
+          console.log(filtered);
+        } else {
+          console.log(data.message || 'Search failed. Please try again.');
+        }
+      } catch (err) {
+        console.log('An error occurred while searching. Please try again.');
+      }
+
+      // Update the state
+      setFilteredRestaurants(filtered);
+    };
+
+    if (searchQuery) {
+      fetchData();
     }
-
-    setFilteredRestaurants(filtered);
-  }, [searchQuery]);
+  }, [searchQuery]); // Dependency array includes `searchQuery`
 
   return (
     <div className="restaurantSection">
@@ -57,18 +77,24 @@ const RestaurantCardSection = ({ searchQuery }) => {
         <div className="cardContainer">
           {filteredRestaurants.map((restaurant, index) => (
             <div key={index} className="card">
-              <img src={restaurant.image} alt={restaurant.name} className="cardImage" />
+              <img
+              src={`http://127.0.0.1:5000/${restaurant.image ? restaurant.image : bgImage}`}
+              alt={restaurant.restaurant_name}
+              className="cardImage"
+              />
+
               <div className="cardContent">
-                <h3>{restaurant.name}</h3>
-                <p>{restaurant.description}</p>
+                <h3>{restaurant.restaurant_name + " (" + restaurant.popularity_score  + ")"}
+                </h3>
+                <p>{restaurant.dish_name}</p>
               </div>
             </div>
           ))}
         </div>
       )}
-      {filteredRestaurants.length === 0 && searchQuery && (
+      {/* {filteredRestaurants.length === 0 && searchQuery && (
         <p>No restaurants found for "{searchQuery}"</p>
-      )}
+      )} */}
     </div>
   );
 };

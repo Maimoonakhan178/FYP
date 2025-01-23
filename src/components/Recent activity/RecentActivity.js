@@ -129,6 +129,7 @@ const RecentActivity = () => {
             <img
               className="activity-image"
               src={activity.image}
+              loading="lazy"
               alt={activity.title}
             />
             <div className="activity-content">
@@ -163,6 +164,7 @@ const RecentActivity = () => {
             <img
               src={selectedActivity.image}
               alt={selectedActivity.title}
+              loading="lazy"
               className="popup-image"
             />
             <p>
