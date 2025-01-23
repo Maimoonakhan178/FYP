@@ -40,9 +40,7 @@ const App = () => {
                 <RestaurantCardSection searchQuery={searchQuery} />
               ) : (
                 <>
-                  <p style={{ textAlign: "center", margin: "20px 0", fontSize: "18px" }}>
-                    Use the search bar above to recommend restaurants.
-                  </p>
+           
                   <RestaurantCardSection searchQuery="" />
                 </>
               )}

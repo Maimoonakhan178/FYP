@@ -27,7 +27,7 @@ const HeroSection = ({ onSearch }) => {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prevSlide) => (prevSlide + 1) % taglines.length); // Ensure correct cycling through slides
-    }, 4000); // Change slide every 4 seconds
+    }, 5000); // Change slide every 4 seconds
 
     return () => clearInterval(interval);
   }, [taglines.length]); // Only depend on the length of taglines
