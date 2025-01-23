@@ -1,22 +1,82 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Logo from "./Logo.webp";
 import "./Header.css";
 import { Button } from "@mui/material";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
-import WriteReview from "./writeareview";  // Import WriteReview component
+import WriteReview from "./writeareview"; // Import WriteReview component
+import Avatar from "@mui/material/Avatar"; // Import Avatar component
+import Stack from "@mui/material/Stack"; // Import Stack component
+
+// Helper function to generate color based on string (used for Avatar)
+function stringToColor(string) {
+  let hash = 0;
+  let i;
+
+  for (i = 0; i < string.length; i++) {
+    hash = string.charCodeAt(i) + ((hash << 5) - hash);
+  }
+
+  let color = "#";
+
+  for (i = 0; i < 3; i++) {
+    const value = (hash >> (i * 8)) & 0xff;
+    color += `00${value.toString(16)}`.slice(-2);
+  }
+
+  return color;
+}
+
+function stringAvatar(name) {
+  return {
+    sx: {
+      bgcolor: stringToColor(name),
+    },
+    children: `${name[0].toUpperCase()}`,
+  };
+}
 
 const Header = () => {
+  const user = JSON.parse(localStorage.getItem("user"));
   const [showModal, setShowModal] = useState(false);
   const [location, setLocation] = useState(null);
+  const [locationName, setLocationName] = useState(""); // Store location name
 
-  // Fetch user's location on button click
+  useEffect(() => {
+    if (user && location) {
+      // Update location in localStorage
+      user.location = location;
+      localStorage.setItem("user", JSON.stringify(user));
+    }
+  }, [location]);
+
+  const getLocationName = async (latitude, longitude) => {
+    const API_KEY = "YOUR_GOOGLE_API_KEY"; // Replace with your API key
+    try {
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${API_KEY}`
+      );
+      const data = await response.json();
+
+      if (data.status === "OK" && data.results.length > 0) {
+        const formattedAddress = data.results[0].formatted_address;
+        setLocationName(formattedAddress); // Set the location name
+      } else {
+        console.error("No location found for these coordinates");
+      }
+    } catch (error) {
+      console.error("Error fetching location data:", error);
+    }
+  };
+
   const handleFetchLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
-          setLocation({ latitude, longitude });
+          let locationString = `${latitude}, ${longitude}`;
+          setLocation(locationString);
+          getLocationName(latitude, longitude);
         },
         (error) => {
           console.error("Error fetching location:", error);
@@ -52,7 +112,7 @@ const Header = () => {
           <span className="navbar-toggler-icon"></span>
         </button>
 
-        {/* Collapsible Navbar Links (Visible on tablets and above) */}
+        {/* Collapsible Navbar Links */}
         <div className="collapse navbar-collapse" id="navbarNav">
           <nav className="navbar-nav me-auto mb-2 mb-lg-0">
             <a className="nav-link" href="/restaurant">
@@ -67,7 +127,7 @@ const Header = () => {
           </nav>
         </div>
 
-        {/* Location Button and Actions */}
+        {/* Location Button and User Actions */}
         <div className="d-flex align-items-center gap-3">
           <Button
             variant="contained"
@@ -89,27 +149,29 @@ const Header = () => {
             Get Location
           </Button>
 
-          {/* Display Fetched Location */}
-          {location && (
-            <span className="text-secondary">
-              {location.latitude.toFixed(2)}, {location.longitude.toFixed(2)}
+          {locationName && (
+            <span className="text-secondary" style={{ marginLeft: "10px" }}>
+              {locationName}
             </span>
           )}
 
-          {/* Actions - These will be visible only on desktop/tablet */}
           <a className="nav-link d-none d-md-block" href="#" onClick={handleShowModal}>
             Write a Review
           </a>
-          <a className="btn btn-outline-secondary d-none d-md-block" href="/login">
-            Log In
-          </a>
-          <a className="btn btn-danger d-none d-md-block" href="/signup">
-            Sign Up
-          </a>
+
+          {user ? (
+            <Stack direction="row" spacing={2}>
+              <Avatar {...stringAvatar(user.name || "User")} />
+            </Stack>
+          ) : (
+            <a className="btn btn-outline-secondary" href="/login">
+              Log In
+            </a>
+          )}
         </div>
       </div>
 
-      {/* Modal Pop-Up for Write a Review */}
+      {/* Modal for Write a Review */}
       {showModal && (
         <div
           className="modal show"
@@ -131,7 +193,11 @@ const Header = () => {
                 ></button>
               </div>
               <div className="modal-body">
-                <WriteReview onSubmitReview={(reviewData) => console.log("Review submitted:", reviewData)} />
+                <WriteReview
+                  onSubmitReview={(reviewData) =>
+                    console.log("Review submitted:", reviewData)
+                  }
+                />
               </div>
             </div>
           </div>
