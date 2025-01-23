@@ -9,6 +9,8 @@ import {
   Box,
 } from "@mui/material";
 import { styled } from "@mui/system";
+import Header from "../Header/Header"; // Import Header
+import Footer from "../Footer/Footer"; // Import Footer
 
 // Styled Card Component
 const StyledCard = styled(Card)({
@@ -63,58 +65,70 @@ const Blog = () => {
   ]);
 
   return (
-    <Container sx={{ marginTop: 6, paddingBottom: 6 }}>
-      <Typography
-        variant="h3"
-        align="center"
-        gutterBottom
-        sx={{
-          marginBottom: 4,
-          fontWeight: "bold",
-          color: "#333",
-          fontFamily: "'Roboto', sans-serif",
-        }}
-      >
-        Food Recommendations
-      </Typography>
-      <Grid container spacing={4}>
-        {posts.map((post, index) => (
-          <Grid item xs={12} sm={6} md={4} key={index}>
-            <StyledCard>
-              <CardContent sx={{ padding: 4 }}>
-                <Typography variant="h5" component="div" gutterBottom sx={{ fontWeight: "bold", color: "#FF7043" }}>
-                  {post.title}
-                </Typography>
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ marginBottom: 2, fontSize: "14px", color: "#777" }}
-                >
-                  {post.date} | Author: {post.author}
-                </Typography>
-                <Typography variant="body1" sx={{ marginBottom: 2, color: "#555" }}>
-                  {post.excerpt}
-                </Typography>
-                <Typography
-                  variant="body2"
-                  color="text.primary"
-                  sx={{
-                    fontWeight: "bold",
-                    marginBottom: 2,
-                    color: "#FF7043",
-                  }}
-                >
-                  Rating: {post.rating} / 5
-                </Typography>
-                <StyledButton variant="contained" size="small">
-                  Read More
-                </StyledButton>
-              </CardContent>
-            </StyledCard>
-          </Grid>
-        ))}
-      </Grid>
-    </Container>
+    <>
+      <Header /> {/* Add Header */}
+      <Container sx={{ marginTop: 6, paddingBottom: 6 }}>
+        <Typography
+          variant="h3"
+          align="center"
+          gutterBottom
+          sx={{
+            marginBottom: 4,
+            fontWeight: "bold",
+            color: "#333",
+            fontFamily: "'Roboto', sans-serif",
+          }}
+        >
+          Food Recommendations
+        </Typography>
+        <Grid container spacing={4}>
+          {posts.map((post, index) => (
+            <Grid item xs={12} sm={6} md={4} key={index}>
+              <StyledCard>
+                <CardContent sx={{ padding: 4 }}>
+                  <Typography
+                    variant="h5"
+                    component="div"
+                    gutterBottom
+                    sx={{ fontWeight: "bold", color: "#FF7043" }}
+                  >
+                    {post.title}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ marginBottom: 2, fontSize: "14px", color: "#777" }}
+                  >
+                    {post.date} | Author: {post.author}
+                  </Typography>
+                  <Typography
+                    variant="body1"
+                    sx={{ marginBottom: 2, color: "#555" }}
+                  >
+                    {post.excerpt}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    color="text.primary"
+                    sx={{
+                      fontWeight: "bold",
+                      marginBottom: 2,
+                      color: "#FF7043",
+                    }}
+                  >
+                    Rating: {post.rating} / 5
+                  </Typography>
+                  <StyledButton variant="contained" size="small">
+                    Read More
+                  </StyledButton>
+                </CardContent>
+              </StyledCard>
+            </Grid>
+          ))}
+        </Grid>
+      </Container>
+      <Footer /> {/* Add Footer */}
+    </>
   );
 };
 

@@ -10,7 +10,7 @@ import RestaurantCardSection from "./components/Restaurant Card Section/Restaura
 import NewsletterSubscribe from "./components/Newsletter/NewsletterSubscribe";
 import TopPicks from "./components/TopPicker/TopPicks";
 import Blog from "./components/blog/blog";
-
+import Survey from "./components/question/question"
 const App = () => {
   const [searchQuery, setSearchQuery] = useState(""); // Tracks the search query
   const [hasSearched, setHasSearched] = useState(false); // Tracks if the user has searched
@@ -29,6 +29,8 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         {/* Main Website */}
         <Route path="/blog" element={<Blog />} />
+        {/* Main Website */}
+        <Route path="/survey" element={<Survey />} />
         {/* Main Website */}
         <Route
           path="/"

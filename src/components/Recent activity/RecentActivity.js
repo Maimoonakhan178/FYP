@@ -145,12 +145,16 @@ const RecentActivity = () => {
         ))}
       </div>
 
-      {/* Show More Button */}
-      {activities.length > 6 && !showAll && (
-        <button className="btn btn-primary" onClick={toggleShowAll}>
-          Show More
-        </button>
-      )}
+     {/* Show More Button */}
+{activities.length > 6 && !showAll && (
+  <button
+    className="btn btn-primary mt-3"
+    onClick={toggleShowAll}
+  >
+    Show More
+  </button>
+)}
+
 
       {/* Popup Modal */}
       {selectedActivity && (
