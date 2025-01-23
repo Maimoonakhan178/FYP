@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Logo from "./Logo.webp";
 import "./Header.css";
@@ -37,10 +37,24 @@ function stringAvatar(name) {
 }
 const Header = () => {
   const user = JSON.parse(localStorage.getItem("user"));
-  console.log(user.name ? user.name.charAt(0).toUpperCase() : "U");
   const [showModal, setShowModal] = useState(false);
   const [location, setLocation] = useState(null);
   const [locationName, setLocationName] = useState(""); // Store location name
+
+  useEffect(() => {
+
+    // Check if the data exists
+    if (user && location) {
+      // Add or update the location property
+      user.location = location; // Replace with the actual location value
+
+      // Save the updated object back to localStorage
+      localStorage.setItem('user', JSON.stringify(user));
+    } else {
+      console.log("User data not found in localStorage.");
+    }
+
+  }, [location]);
 
   // Function to fetch location name based on latitude and longitude
   const getLocationName = async (latitude, longitude) => {
@@ -68,6 +82,8 @@ const Header = () => {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
+          let locationString = `${latitude}, ${longitude}`;
+          setLocation(locationString);
           getLocationName(latitude, longitude); // Get location name after coordinates
         },
         (error) => {
@@ -127,11 +143,11 @@ const Header = () => {
           </Button>
 
           {/* Display Fetched Location */}
-          {location && (
+          {/* {location && (
             <span className="text-secondary">
               {location.latitude.toFixed(2)}, {location.longitude.toFixed(2)}
             </span>
-          )}
+          )} */}
 
           {/* Display Location Name */}
           {locationName && (
