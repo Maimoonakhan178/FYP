@@ -39,20 +39,35 @@ const Header = () => {
           <img src={Logo} alt="Logo" style={{ height: "40px" }} />
         </a>
 
-        {/* Navigation Links */}
-        <nav className="navbar-nav me-auto mb-2 mb-lg-0">
-          <a className="nav-link" href="/restaurant">
-            Restaurants
-          </a>
-          <a className="nav-link" href="/blog">
-            Blog
-          </a>
-          <a className="nav-link" href="/survey">
-            Survey
-          </a>
-        </nav>
+        {/* Navbar Toggler for Mobile */}
+        <button
+          className="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span className="navbar-toggler-icon"></span>
+        </button>
 
-        {/* Location Button */}
+        {/* Collapsible Navbar Links (Visible on tablets and above) */}
+        <div className="collapse navbar-collapse" id="navbarNav">
+          <nav className="navbar-nav me-auto mb-2 mb-lg-0">
+            <a className="nav-link" href="/restaurant">
+              Restaurants
+            </a>
+            <a className="nav-link" href="/blog">
+              Blog
+            </a>
+            <a className="nav-link" href="/survey">
+              Survey
+            </a>
+          </nav>
+        </div>
+
+        {/* Location Button and Actions */}
         <div className="d-flex align-items-center gap-3">
           <Button
             variant="contained"
@@ -81,14 +96,14 @@ const Header = () => {
             </span>
           )}
 
-          {/* Actions */}
-          <a className="nav-link" href="#" onClick={handleShowModal}>
+          {/* Actions - These will be visible only on desktop/tablet */}
+          <a className="nav-link d-none d-md-block" href="#" onClick={handleShowModal}>
             Write a Review
           </a>
-          <a className="btn btn-outline-secondary" href="/login">
+          <a className="btn btn-outline-secondary d-none d-md-block" href="/login">
             Log In
           </a>
-          <a className="btn btn-danger" href="/signup">
+          <a className="btn btn-danger d-none d-md-block" href="/signup">
             Sign Up
           </a>
         </div>
