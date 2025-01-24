@@ -51,7 +51,7 @@ const Header = () => {
   }, [location]);
 
   const getLocationName = async (latitude, longitude) => {
-    const API_KEY = "AIzaSyAz3I5oxXOCDhnxbteGn9osc-M3DeHE_Iw"; // Replace with your API key
+    const API_KEY = process.env.REACT_APP_GOOGLE_API_KEY;
     try {
       const response = await fetch(
         `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${API_KEY}`
