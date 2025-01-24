@@ -37,7 +37,7 @@ function stringAvatar(name) {
 }
 
 const Header = () => {
-  const user = JSON.parse(localStorage.getItem("user"));
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
   const [showModal, setShowModal] = useState(false);
   const [location, setLocation] = useState(null);
   const [locationName, setLocationName] = useState(""); // Store location name
@@ -48,7 +48,7 @@ const Header = () => {
       user.location = location;
       localStorage.setItem("user", JSON.stringify(user));
     }
-  }, [location]);
+  }, [location, user]);
 
   const getLocationName = async (latitude, longitude) => {
     const API_KEY = process.env.REACT_APP_GOOGLE_API_KEY;
@@ -62,8 +62,6 @@ const Header = () => {
         const formattedAddress = data.results[0].formatted_address;
         setLocationName(formattedAddress); // Set the location name
       } else {
-        console.log(data.results)
-        console.log(data.results[0])
         console.error("No location found for these coordinates");
       }
     } catch (error) {
@@ -94,11 +92,15 @@ const Header = () => {
       alert("Geolocation not supported");
     }
   };
-  
-  
 
   const handleShowModal = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
+
+  // Handle Logout
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    setUser(null); // Reset user state
+  };
 
   return (
     <header className="navbar navbar-expand-lg navbar-light bg-white border-bottom">
@@ -169,9 +171,14 @@ const Header = () => {
           </a>
 
           {user ? (
-            <Stack direction="row" spacing={2}>
-              <Avatar {...stringAvatar(user.name || "User")} />
-            </Stack>
+            <div className="d-flex align-items-center gap-3">
+              <Stack direction="row" spacing={2}>
+                <Avatar {...stringAvatar(user.name || "User")} />
+              </Stack>
+              <Button variant="outlined" onClick={handleLogout}>
+                Log Out
+              </Button>
+            </div>
           ) : (
             <a className="btn btn-outline-secondary" href="/login">
               Log In
