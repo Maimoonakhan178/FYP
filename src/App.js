@@ -11,7 +11,7 @@ import NewsletterSubscribe from "./components/Newsletter/NewsletterSubscribe";
 import TopPicks from "./components/TopPicker/TopPicks";
 import Blog from "./components/blog/blog";
 import Survey from "./components/question/question";
-
+import Restaurants from "./components/restaurant/restaurant";
 // Helper function to check authentication
 const isAuthenticated = () => !!localStorage.getItem('user');
 
@@ -44,6 +44,7 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/survey" element={<Survey />} />
+        <Route path="/restaurant" element={<Restaurants />} />
 
         {/* Protected Routes */}
         <Route
