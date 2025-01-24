@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./RecentActivity.css"; // Assuming you use this for styles
+import { Card, CardContent, CardMedia, Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography, Box, Grid } from "@mui/material";
 import bgImage from "./r.jpg";
 import bgImage1 from "./r (1).jpg";
 import bgImage2 from "./r (2).jpg";
@@ -11,7 +11,7 @@ import bgImage7 from "./r (7).jpg";
 
 const RecentActivity = () => {
   const [selectedActivity, setSelectedActivity] = useState(null);
-  const [showAll, setShowAll] = useState(false); // Track whether to show all activities
+  const [showAll, setShowAll] = useState(false);
 
   const activities = [
     {
@@ -21,8 +21,7 @@ const RecentActivity = () => {
       title: "Earl of Sandwich",
       rating: 5,
       image: bgImage,
-      description:
-        "Easily one of the best fast-food sandwich chains in the U.S., Earl of Sandwich is a must-try.",
+      description: "Easily one of the best fast-food sandwich chains in the U.S., Earl of Sandwich is a must-try.",
     },
     {
       user: "Mario E.",
@@ -94,8 +93,7 @@ const RecentActivity = () => {
       title: "Ice Cream Corner",
       rating: 5,
       image: bgImage,
-      description:
-        "Cards will appear with a clean, modern look, with smooth hover animations and subtle color transitions.",
+      description: "Cards will appear with a clean, modern look, with smooth hover animations and subtle color transitions.",
     },
   ];
 
@@ -112,83 +110,88 @@ const RecentActivity = () => {
   const displayedActivities = showAll ? activities : activities.slice(0, 6);
 
   return (
-    <div className="recent-activity">
-      <h2>Recent Activity</h2>
-      <div className="activity-cards">
+    <Box sx={{ p: 2 }}>
+      <Typography variant="h4" sx={{ mb: 2 }}>
+        Recent Activity
+      </Typography>
+      <Grid container spacing={2}>
         {displayedActivities.map((activity, index) => (
-          <div
-            className="activity-card"
-            key={index}
-            onClick={() => openPopup(activity)}
-          >
-            <div className="activity-header">
-              <strong>{activity.user}</strong> {activity.action} •{" "}
-              <span className="activity-time">{activity.time}</span>
-            </div>
-            <img
-              className="activity-image"
-              src={activity.image}
-              loading="lazy"
-              alt={activity.title}
-            />
-            <div className="activity-content">
-              <h3>{activity.title}</h3>
-              <div className="activity-rating">
-                <span>{"★".repeat(activity.rating)}</span>
-                <span>{"☆".repeat(5 - activity.rating)}</span>
-              </div>
-              {activity.description && (
-                <p className="activity-description">{activity.description}</p>
-              )}
-            </div>
-          </div>
+          <Grid item xs={12} sm={6} md={4} key={index}>
+            <Card sx={{ cursor: "pointer" }} onClick={() => openPopup(activity)}>
+              <CardMedia
+                component="img"
+                alt={activity.title}
+                height="140"
+                image={activity.image}
+                sx={{ objectFit: "cover" }}
+              />
+              <CardContent>
+                <Typography variant="body1" fontWeight="bold">
+                  {activity.user} {activity.action}
+                </Typography>
+                <Typography variant="body2" color="textSecondary">
+                  {activity.time}
+                </Typography>
+                <Typography variant="h6">{activity.title}</Typography>
+                <Typography variant="body2" sx={{ mb: 1 }}>
+                  {"★".repeat(activity.rating)}{"☆".repeat(5 - activity.rating)}
+                </Typography>
+                {activity.description && (
+                  <Typography variant="body2" color="textSecondary">
+                    {activity.description}
+                  </Typography>
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
         ))}
-      </div>
+      </Grid>
 
-      {/* Show More / Show Less Buttons */}
+      {/* Show More / Show Less Button */}
       {activities.length > 6 && (
-        <button className="btn btn-primary mt-3" onClick={toggleShowAll}>
+        <Button variant="contained" sx={{ mt: 3 }} onClick={toggleShowAll}>
           {showAll ? "Show Less" : "Show More"}
-        </button>
+        </Button>
       )}
 
       {/* Popup Modal */}
       {selectedActivity && (
-        <div className="popup-overlay" onClick={closePopup}>
-          <div className="popup-content" onClick={(e) => e.stopPropagation()}>
-            <button className="popup-close" onClick={closePopup}>
-              ✖
-            </button>
-            <h2>{selectedActivity.title}</h2>
+        <Dialog open={true} onClose={closePopup} maxWidth="sm" fullWidth>
+          <DialogTitle>{selectedActivity.title}</DialogTitle>
+          <DialogContent>
             <img
               src={selectedActivity.image}
               alt={selectedActivity.title}
-              loading="lazy"
-              className="popup-image"
+              style={{ width: "100%", marginBottom: "16px" }}
             />
-            <p>
+            <Typography variant="body1">
               <strong>User:</strong> {selectedActivity.user}
-            </p>
-            <p>
+            </Typography>
+            <Typography variant="body1">
               <strong>Action:</strong> {selectedActivity.action}
-            </p>
-            <p>
+            </Typography>
+            <Typography variant="body1">
               <strong>Time:</strong> {selectedActivity.time}
-            </p>
-            <p>
+            </Typography>
+            <Typography variant="body1">
               <strong>Rating:</strong>{" "}
               <span>{"★".repeat(selectedActivity.rating)}</span>
               <span>{"☆".repeat(5 - selectedActivity.rating)}</span>
-            </p>
+            </Typography>
             {selectedActivity.description && (
-              <p>
+              <Typography variant="body1">
                 <strong>Description:</strong> {selectedActivity.description}
-              </p>
+              </Typography>
             )}
-          </div>
-        </div>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={closePopup} color="primary">
+              Close
+            </Button>
+          </DialogActions>
+        </Dialog>
       )}
-    </div>
+    </Box>
   );
 };
 

@@ -1,5 +1,10 @@
 import React, { useState } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import Signup from "./components/Signup/signup";
 import Login from "./components/Signup/login";
 import HeroSection from "./components/Hero Section/HeroSection";
@@ -13,7 +18,7 @@ import Blog from "./components/blog/blog";
 import Survey from "./components/question/question";
 import Restaurants from "./components/restaurant/restaurant";
 // Helper function to check authentication
-const isAuthenticated = () => !!localStorage.getItem('user');
+const isAuthenticated = () => !!localStorage.getItem("user");
 
 // ProtectedRoute component to protect routes and include Header
 const ProtectedRoute = ({ children }) => {
@@ -56,10 +61,9 @@ const App = () => {
                 {hasSearched ? (
                   <RestaurantCardSection searchQuery={searchQuery} />
                 ) : (
-                  <p style={{ textAlign: "center", margin: "20px 0", fontSize: "18px" }}>
-                    Use the search bar above to recommend restaurants.
-                  </p>
+                 null
                 )}
+
                 <RecentActivity />
                 <TopPicks />
                 <NewsletterSubscribe />
