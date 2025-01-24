@@ -51,7 +51,7 @@ const Header = () => {
   }, [location]);
 
   const getLocationName = async (latitude, longitude) => {
-    const API_KEY = "YOUR_GOOGLE_API_KEY"; // Replace with your API key
+    const API_KEY = "AIzaSyAz3I5oxXOCDhnxbteGn9osc-M3DeHE_Iw"; // Replace with your API key
     try {
       const response = await fetch(
         `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${API_KEY}`
@@ -62,6 +62,8 @@ const Header = () => {
         const formattedAddress = data.results[0].formatted_address;
         setLocationName(formattedAddress); // Set the location name
       } else {
+        console.log(data.results)
+        console.log(data.results[0])
         console.error("No location found for these coordinates");
       }
     } catch (error) {
@@ -74,19 +76,26 @@ const Header = () => {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
-          let locationString = `${latitude}, ${longitude}`;
+          const locationString = `${latitude}, ${longitude}`;
           setLocation(locationString);
           getLocationName(latitude, longitude);
         },
         (error) => {
-          console.error("Error fetching location:", error);
-          alert("Unable to fetch location. Please enable location services.");
+          console.error("Location error:", error);
+          alert("Location unavailable. Enable location services.");
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 0
         }
       );
     } else {
-      alert("Geolocation is not supported by your browser.");
+      alert("Geolocation not supported");
     }
   };
+  
+  
 
   const handleShowModal = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);

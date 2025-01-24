@@ -55,7 +55,7 @@ const FoodieLoginPage = () => {
       form.append('email', formData.email); // Add email to form
       form.append('password', formData.password); // Add password to form
 
-      const response = await fetch('http://127.0.0.1:5000/api/signin', {
+      const response = await fetch('https://ai.myedbox.com/api/api/signin', {
         method: 'POST',
         body: form, // Send FormData
       });

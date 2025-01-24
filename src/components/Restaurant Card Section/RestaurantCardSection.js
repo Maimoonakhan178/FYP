@@ -45,7 +45,7 @@ const RestaurantCardSection = ({ searchQuery }) => {
         form.append('query', sanitizedSearchQuery); // Add query to form
 
         // Send the POST request
-        const response = await fetch('http://127.0.0.1:5000/api/search', {
+        const response = await fetch('https://ai.myedbox.com/api/api/search', {
           method: 'POST',
           body: form,
         });
@@ -78,13 +78,13 @@ const RestaurantCardSection = ({ searchQuery }) => {
           {filteredRestaurants.map((restaurant, index) => (
             <div key={index} className="card">
               <img
-              src={`http://127.0.0.1:5000/${restaurant.image ? restaurant.image : bgImage}`}
+              src={`https://ai.myedbox.com/api/api/${restaurant.image ? restaurant.image : bgImage}`}
               alt={restaurant.restaurant_name}
               className="cardImage"
               />
 
               <div className="cardContent">
-                <h3>{restaurant.restaurant_name + " (" + restaurant.popularity_score  + ")"}
+                <h3>{restaurant.restaurant_name +" " +restaurant.location_name + " (" + restaurant.popularity_score  + ")"}
                 </h3>
                 <p>{restaurant.dish_name}</p>
               </div>
