@@ -100,3 +100,4 @@ const RestaurantCardSection = ({ searchQuery }) => {
 };
 
 export default RestaurantCardSection;
+
