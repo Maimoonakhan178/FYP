@@ -35,6 +35,7 @@ function stringAvatar(name) {
     children: `${name[0].toUpperCase()}`,
   };
 }
+
 const Header = () => {
   const user = JSON.parse(localStorage.getItem("user"));
   const [showModal, setShowModal] = useState(false);
@@ -42,23 +43,15 @@ const Header = () => {
   const [locationName, setLocationName] = useState(""); // Store location name
 
   useEffect(() => {
-
-    // Check if the data exists
     if (user && location) {
-      // Add or update the location property
-      user.location = location; // Replace with the actual location value
-
-      // Save the updated object back to localStorage
-      localStorage.setItem('user', JSON.stringify(user));
-    } else {
-      console.log("User data not found in localStorage.");
+      // Update location in localStorage
+      user.location = location;
+      localStorage.setItem("user", JSON.stringify(user));
     }
-
   }, [location]);
 
-  // Function to fetch location name based on latitude and longitude
   const getLocationName = async (latitude, longitude) => {
-    const API_KEY = "AIzaSyAz3I5oxXOCDhnxbteGn9osc-M3DeHE_Iw"; // Replace with your API key
+    const API_KEY = "YOUR_GOOGLE_API_KEY"; // Replace with your API key
     try {
       const response = await fetch(
         `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${API_KEY}`
@@ -76,7 +69,6 @@ const Header = () => {
     }
   };
 
-  // Fetch user's location and set coordinates and name
   const handleFetchLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -84,7 +76,7 @@ const Header = () => {
           const { latitude, longitude } = position.coords;
           let locationString = `${latitude}, ${longitude}`;
           setLocation(locationString);
-          getLocationName(latitude, longitude); // Get location name after coordinates
+          getLocationName(latitude, longitude);
         },
         (error) => {
           console.error("Error fetching location:", error);
@@ -107,20 +99,35 @@ const Header = () => {
           <img src={Logo} alt="Logo" style={{ height: "40px" }} />
         </a>
 
-        {/* Navigation Links */}
-        <nav className="navbar-nav me-auto mb-2 mb-lg-0">
-          <a className="nav-link" href="/restaurant">
-            Restaurants
-          </a>
-          <a className="nav-link" href="/blog">
-            Blog
-          </a>
-          <a className="nav-link" href="/survey">
-            Survey
-          </a>
-        </nav>
+        {/* Navbar Toggler for Mobile */}
+        <button
+          className="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span className="navbar-toggler-icon"></span>
+        </button>
 
-        {/* Location Button */}
+        {/* Collapsible Navbar Links */}
+        <div className="collapse navbar-collapse" id="navbarNav">
+          <nav className="navbar-nav me-auto mb-2 mb-lg-0">
+            <a className="nav-link" href="/restaurant">
+              Restaurants
+            </a>
+            <a className="nav-link" href="/blog">
+              Blog
+            </a>
+            <a className="nav-link" href="/survey">
+              Survey
+            </a>
+          </nav>
+        </div>
+
+        {/* Location Button and User Actions */}
         <div className="d-flex align-items-center gap-3">
           <Button
             variant="contained"
@@ -142,30 +149,20 @@ const Header = () => {
             Get Location
           </Button>
 
-          {/* Display Fetched Location */}
-          {/* {location && (
-            <span className="text-secondary">
-              {location.latitude.toFixed(2)}, {location.longitude.toFixed(2)}
-            </span>
-          )} */}
-
-          {/* Display Location Name */}
           {locationName && (
             <span className="text-secondary" style={{ marginLeft: "10px" }}>
               {locationName}
             </span>
           )}
 
-          {/* Actions */}
-          <a className="nav-link" href="#" onClick={handleShowModal}>
+          <a className="nav-link d-none d-md-block" href="#" onClick={handleShowModal}>
             Write a Review
           </a>
+
           {user ? (
-            <>
-              <Stack direction="row" spacing={2}>
-                <Avatar {...stringAvatar(user.name ? user.name : "User")} />
-              </Stack>
-            </>
+            <Stack direction="row" spacing={2}>
+              <Avatar {...stringAvatar(user.name || "User")} />
+            </Stack>
           ) : (
             <a className="btn btn-outline-secondary" href="/login">
               Log In
@@ -174,7 +171,7 @@ const Header = () => {
         </div>
       </div>
 
-      {/* Modal Pop-Up for Write a Review */}
+      {/* Modal for Write a Review */}
       {showModal && (
         <div
           className="modal show"

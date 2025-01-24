@@ -10,6 +10,7 @@ import RestaurantCardSection from "./components/Restaurant Card Section/Restaura
 import NewsletterSubscribe from "./components/Newsletter/NewsletterSubscribe";
 import TopPicks from "./components/TopPicker/TopPicks";
 import Blog from "./components/blog/blog";
+import Survey from "./components/question/question";
 
 // Helper function to check authentication
 const isAuthenticated = () => !!localStorage.getItem('user');
@@ -41,6 +42,8 @@ const App = () => {
         {/* Public Routes */}
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/blog" element={<Blog />} />
+        <Route path="/survey" element={<Survey />} />
 
         {/* Protected Routes */}
         <Route
@@ -64,9 +67,6 @@ const App = () => {
             </ProtectedRoute>
           }
         />
-
-        {/* Blog Page */}
-        <Route path="/blog" element={<Blog />} />
 
         {/* Redirect unknown routes to /signup */}
         <Route path="*" element={<Navigate to="/signup" />} />

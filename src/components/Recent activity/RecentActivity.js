@@ -94,7 +94,8 @@ const RecentActivity = () => {
       title: "Ice Cream Corner",
       rating: 5,
       image: bgImage,
-      description: "Cards will appear with a clean, modern look, with smooth hover animations and subtle color transitions.",
+      description:
+        "Cards will appear with a clean, modern look, with smooth hover animations and subtle color transitions.",
     },
   ];
 
@@ -102,9 +103,7 @@ const RecentActivity = () => {
     setSelectedActivity(activity);
   };
 
-  const closePopup = () => {
-    setSelectedActivity(null);
-  };
+  const closePopup = () => setSelectedActivity(null);
 
   const toggleShowAll = () => {
     setShowAll(!showAll);
@@ -146,10 +145,10 @@ const RecentActivity = () => {
         ))}
       </div>
 
-      {/* Show More Button */}
-      {activities.length > 6 && !showAll && (
-        <button className="btn btn-primary" onClick={toggleShowAll}>
-          Show More
+      {/* Show More / Show Less Buttons */}
+      {activities.length > 6 && (
+        <button className="btn btn-primary mt-3" onClick={toggleShowAll}>
+          {showAll ? "Show Less" : "Show More"}
         </button>
       )}
 
