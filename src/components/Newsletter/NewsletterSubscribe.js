@@ -20,7 +20,7 @@ const NewsletterSubscribe = () => {
 
 
         // Send the POST request
-        const response = await fetch('http://127.0.0.1:5000/api/newsletter', {
+        const response = await fetch('https://ai.myedbox.com/api/api/newsletter', {
           method: 'POST',
           body: form,
         });
