@@ -1,47 +1,124 @@
-import React from "react";
-import "./TopPicks.css";
-import Card from "./best (1).jpg";
-import Card1 from "./best (2).jpg";
-import Card2 from "./best (3).jpg";
-const recommendations = [
-  {
-    id: 1,
-    title: "Best Italian Pizza",
-    description: "Hand-picked authentic Italian pizzas with fresh ingredients.",
-    image: Card2,
-  },
-  {
-    id: 2,
-    title: "Award-Winning Burgers",
-    description: "Juicy, mouth-watering burgers voted best in town.",
-    image: Card,
-  },
-  {
-    id: 3,
-    title: "Exquisite Sushi Rolls",
-    description: "Delightful sushi rolls crafted by expert chefs.",
-    image: Card1,
-  },
-];
+import React, { useState, useEffect } from "react";
+import { 
+  Card, 
+  CardMedia, 
+  CardContent, 
+  Typography, 
+  Box, 
+  Chip, 
+  Avatar,
+  Rating
+} from "@mui/material";
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import RestaurantIcon from '@mui/icons-material/Restaurant';
 
-const TopPicks = () => {
+const TopRestaurants = () => {
+  const [restaurants, setRestaurants] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchRestaurants = async () => {
+      try {
+        const response = await fetch('https://ai.myedbox.com/api/api/top-rated-restaurants', {
+          method: 'POST',
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          setRestaurants(data.restaurants || []);
+        }
+      } catch (error) {
+        console.error("Fetch error:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRestaurants();
+  }, []);
+
+  const RestaurantCard = ({ restaurant }) => {
+    const cuisineTypes = JSON.parse(restaurant.cuisine_type);
+
+    return (
+      <Card 
+        sx={{ 
+          maxWidth: 345, 
+          m: 2, 
+          boxShadow: 3,
+          transition: 'transform 0.3s',
+          '&:hover': { 
+            transform: 'scale(1.05)',
+            boxShadow: 6 
+          }
+        }}
+      >
+        <CardMedia
+          component="img"
+          height="200"
+          image={`https://ai.myedbox.com/api/api/${restaurant.restaurant_image ? restaurant.restaurant_image : ""}`}
+          alt={restaurant.restaurant_name}
+        />
+        <CardContent>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <Typography variant="h5" component="div">
+              {restaurant.restaurant_name}
+            </Typography>
+            <Rating 
+              value={restaurant.average_rating} 
+              precision={0.1} 
+              readOnly 
+              max={5}
+            />
+          </Box>
+
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+            <LocationOnIcon sx={{ mr: 1, color: 'text.secondary' }} />
+            <Typography variant="body2" color="text.secondary">
+              {restaurant.location_name}
+            </Typography>
+          </Box>
+
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 1 }}>
+            {cuisineTypes.map((cuisine) => (
+              <Chip 
+                key={cuisine}
+                icon={<RestaurantIcon />}
+                label={cuisine} 
+                size="small" 
+                color="secondary" 
+                variant="outlined" 
+              />
+            ))}
+          </Box>
+
+          <Typography variant="caption" color="text.secondary">
+            Overall Score: {(restaurant.overall_average_score * 100).toFixed(2)}%
+          </Typography>
+        </CardContent>
+      </Card>
+    );
+  };
+
+  if (loading) return <Typography>Loading restaurants...</Typography>;
+
   return (
-    <div className="top-picks-container">
-      <h2>🍽️ Top Picks For You</h2>
-      <p className="top-picks-subtitle">
-        Discover the most recommended dishes and restaurants.
-      </p>
-      <div className="top-picks-grid">
-        {recommendations.map((item) => (
-          <div key={item.id} className="top-picks-card">
-            <img src={item.image} alt={item.title} className="top-picks-image" />
-            <h3>{item.title}</h3>
-            <p>{item.description}</p>
-          </div>
-        ))}
-      </div>
-    </div>
+    <Box 
+      sx={{ 
+        display: 'flex', 
+        flexWrap: 'wrap', 
+        justifyContent: 'center', 
+        p: 2 
+      }}
+    >
+      {restaurants.map(restaurant => (
+        <RestaurantCard 
+          key={restaurant.restaurant_id} 
+          restaurant={restaurant} 
+        />
+      ))}
+    </Box>
   );
 };
 
-export default TopPicks;
+export default TopRestaurants;
