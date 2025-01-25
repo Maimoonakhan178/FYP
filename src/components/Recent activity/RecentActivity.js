@@ -1,191 +1,241 @@
-import React, { useState } from "react";
-import { Card, CardContent, CardMedia, Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography, Box, Grid } from "@mui/material";
-import bgImage from "./r.jpg";
-import bgImage1 from "./r (1).jpg";
-import bgImage2 from "./r (2).jpg";
-import bgImage3 from "./r (3).jpg";
-import bgImage4 from "./r (4).jpg";
-import bgImage5 from "./r (5).jpg";
-import bgImage6 from "./r (6).jpg";
-import bgImage7 from "./r (7).jpg";
+import React, { useState, useEffect } from "react";
+import { 
+  Card, 
+  CardContent, 
+  CardMedia, 
+  Button, 
+  Dialog, 
+  DialogActions, 
+  DialogContent, 
+  DialogTitle, 
+  Typography, 
+  Box, 
+  Grid, 
+  Chip,
+  Avatar
+} from "@mui/material";
+import RestaurantIcon from '@mui/icons-material/Restaurant';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import SentimentVeryDissatisfiedIcon from '@mui/icons-material/SentimentVeryDissatisfied';
+import SentimentSatisfiedIcon from '@mui/icons-material/SentimentSatisfied';
 
 const RecentActivity = () => {
-  const [selectedActivity, setSelectedActivity] = useState(null);
+  const [reviews, setReviews] = useState([]);
+  const [selectedReview, setSelectedReview] = useState(null);
   const [showAll, setShowAll] = useState(false);
 
-  const activities = [
-    {
-      user: "Mario E.",
-      action: "wrote a review",
-      time: "Just now",
-      title: "Earl of Sandwich",
-      rating: 5,
-      image: bgImage,
-      description: "Easily one of the best fast-food sandwich chains in the U.S., Earl of Sandwich is a must-try.",
-    },
-    {
-      user: "Mario E.",
-      action: "added a photo",
-      time: "Just now",
-      title: "Earl of Sandwich",
-      rating: 4,
-      image: bgImage1,
-      description: null,
-    },
-    {
-      user: "Stacey I.",
-      action: "added a photo",
-      time: "Just now",
-      title: "Raising Cane's Chicken Fingers",
-      rating: 4,
-      image: bgImage2,
-      description: null,
-    },
-    {
-      user: "Anna P.",
-      action: "checked in",
-      time: "5 mins ago",
-      title: "The Coffee House",
-      rating: 5,
-      image: bgImage3,
-      description: "A cozy place for a morning coffee and quick breakfast.",
-    },
-    {
-      user: "John D.",
-      action: "wrote a review",
-      time: "10 mins ago",
-      title: "Sushi World",
-      rating: 3,
-      image: bgImage4,
-      description: "The sushi was okay, but the service could be better.",
-    },
-    {
-      user: "Linda K.",
-      action: "added a photo",
-      time: "15 mins ago",
-      title: "Burger Shack",
-      rating: 4,
-      image: bgImage5,
-      description: null,
-    },
-    {
-      user: "Mark T.",
-      action: "liked a review",
-      time: "20 mins ago",
-      title: "Pasta Paradise",
-      rating: 5,
-      image: bgImage6,
-      description: "This pasta was absolutely delicious!",
-    },
-    {
-      user: "Sophia R.",
-      action: "added a review",
-      time: "30 mins ago",
-      title: "Pizza Express",
-      rating: 4,
-      image: bgImage7,
-      description: "Great pizza, but the crust was a bit too thick for my taste.",
-    },
-    {
-      user: "Tom W.",
-      action: "added a photo",
-      time: "45 mins ago",
-      title: "Ice Cream Corner",
-      rating: 5,
-      image: bgImage,
-      description: "Cards will appear with a clean, modern look, with smooth hover animations and subtle color transitions.",
-    },
-  ];
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const response = await fetch('https://ai.myedbox.com/api/api/recent', {
+          method: 'POST',
+        });
 
-  const openPopup = (activity) => {
-    setSelectedActivity(activity);
+        const data = await response.json();
+        if (response.ok) {
+          setReviews(data.reviews || []);
+        } else {
+          console.error(data.message || 'Failed to fetch reviews');
+        }
+      } catch (err) {
+        console.error('Network error');
+      }
+    };
+
+    fetchReviews();
+  }, []);
+
+  const displayedReviews = showAll ? reviews : reviews.slice(0, 6);
+
+  const getSentimentIcon = (sentiment) => {
+    switch(sentiment) {
+      case 'POS':
+        return <SentimentSatisfiedIcon color="success" />;
+      case 'NEG':
+        return <SentimentVeryDissatisfiedIcon color="error" />;
+      default:
+        return <SentimentSatisfiedIcon color="neutral" />;
+    }
   };
 
-  const closePopup = () => setSelectedActivity(null);
-
-  const toggleShowAll = () => {
-    setShowAll(!showAll);
+  const formatDate = (timestamp) => {
+    const date = new Date(timestamp);
+    return date.toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
-
-  const displayedActivities = showAll ? activities : activities.slice(0, 6);
 
   return (
-    <Box sx={{ p: 2 }}>
-      <Typography variant="h4" sx={{ mb: 2 }}>
-        Recent Activity
+    <Box sx={{ p: 3, backgroundColor: '#f5f5f5' }}>
+      <Typography variant="h4" sx={{ mb: 3, fontWeight: 'bold', color: '#333' }}>
+        Recent Restaurant Reviews
       </Typography>
-      <Grid container spacing={2}>
-        {displayedActivities.map((activity, index) => (
-          <Grid item xs={12} sm={6} md={4} key={index}>
-            <Card sx={{ cursor: "pointer" }} onClick={() => openPopup(activity)}>
+
+      <Grid container spacing={3}>
+        {displayedReviews.map((review) => (
+          <Grid item xs={12} sm={6} md={4} key={review.review_id}>
+            <Card 
+              sx={{ 
+                height: '100%', 
+                display: 'flex', 
+                flexDirection: 'column', 
+                transition: 'transform 0.2s',
+                '&:hover': { 
+                  transform: 'scale(1.03)',
+                  boxShadow: 3 
+                }
+              }}
+              onClick={() => setSelectedReview(review)}
+            >
               <CardMedia
                 component="img"
-                alt={activity.title}
-                height="140"
-                image={activity.image}
-                sx={{ objectFit: "cover" }}
+                height="200"
+                image={`https://ai.myedbox.com/api/api/${review.restaurant_image ? review.restaurant_image : ""}`}
+                alt={review.restaurant_name}
+                sx={{ objectFit: 'cover' }}
               />
-              <CardContent>
-                <Typography variant="body1" fontWeight="bold">
-                  {activity.user} {activity.action}
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  {activity.time}
-                </Typography>
-                <Typography variant="h6">{activity.title}</Typography>
-                <Typography variant="body2" sx={{ mb: 1 }}>
-                  {"★".repeat(activity.rating)}{"☆".repeat(5 - activity.rating)}
-                </Typography>
-                {activity.description && (
-                  <Typography variant="body2" color="textSecondary">
-                    {activity.description}
+              <CardContent sx={{ flexGrow: 1 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                  <RestaurantIcon sx={{ mr: 1, color: 'primary.main' }} />
+                  <Typography variant="subtitle2" color="text.secondary">
+                    {review.restaurant_name}
                   </Typography>
-                )}
+                </Box>
+
+                <Typography variant="body2" sx={{ mb: 1 }}>
+                  {review.review_text.length > 100 
+                    ? `${review.review_text.slice(0, 100)}...` 
+                    : review.review_text}
+                </Typography>
+
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Chip 
+                    icon={getSentimentIcon(review.overall_sentiment)}
+                    label={review.overall_sentiment} 
+                    size="small" 
+                    color={
+                      review.overall_sentiment === 'POS' ? 'success' : 
+                      review.overall_sentiment === 'NEG' ? 'error' : 'default'
+                    }
+                  />
+                  <Typography variant="caption" color="text.secondary">
+                    {formatDate(review.timestamp)}
+                  </Typography>
+                </Box>
               </CardContent>
             </Card>
           </Grid>
         ))}
       </Grid>
 
-      {/* Show More / Show Less Button */}
-      {activities.length > 6 && (
-        <Button variant="contained" sx={{ mt: 3 }} onClick={toggleShowAll}>
-          {showAll ? "Show Less" : "Show More"}
-        </Button>
+      {reviews.length > 6 && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+          <Button 
+            variant="contained" 
+            color="primary" 
+            onClick={() => setShowAll(!showAll)}
+          >
+            {showAll ? 'Show Less' : 'Show More Reviews'}
+          </Button>
+        </Box>
       )}
 
-      {/* Popup Modal */}
-      {selectedActivity && (
-        <Dialog open={true} onClose={closePopup} maxWidth="sm" fullWidth>
-          <DialogTitle>{selectedActivity.title}</DialogTitle>
+      {selectedReview && (
+        <Dialog 
+          open={!!selectedReview} 
+          onClose={() => setSelectedReview(null)}
+          maxWidth="md"
+          fullWidth
+        >
+          <DialogTitle>
+            Review Details - {selectedReview.restaurant_name}
+          </DialogTitle>
           <DialogContent>
-            <img
-              src={selectedActivity.image}
-              alt={selectedActivity.title}
-              style={{ width: "100%", marginBottom: "16px" }}
-            />
-            <Typography variant="body1">
-              <strong>User:</strong> {selectedActivity.user}
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+              <Avatar 
+                sx={{ 
+                  width: 56, 
+                  height: 56, 
+                  mr: 2, 
+                  bgcolor: 'primary.main' 
+                }}
+                src={selectedReview.restaurant_image || undefined}
+              >
+                <RestaurantIcon />
+              </Avatar>
+              <Box>
+                <Typography variant="h6">
+                  {selectedReview.restaurant_name}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {formatDate(selectedReview.timestamp)}
+                </Typography>
+              </Box>
+            </Box>
+
+            <Typography variant="body1" sx={{ mb: 2 }}>
+              {selectedReview.review_text}
             </Typography>
-            <Typography variant="body1">
-              <strong>Action:</strong> {selectedActivity.action}
-            </Typography>
-            <Typography variant="body1">
-              <strong>Time:</strong> {selectedActivity.time}
-            </Typography>
-            <Typography variant="body1">
-              <strong>Rating:</strong>{" "}
-              <span>{"★".repeat(selectedActivity.rating)}</span>
-              <span>{"☆".repeat(5 - selectedActivity.rating)}</span>
-            </Typography>
-            {selectedActivity.description && (
-              <Typography variant="body1">
-                <strong>Description:</strong> {selectedActivity.description}
-              </Typography>
+
+            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+              <Chip 
+                icon={<AccessTimeIcon />}
+                label={`Timestamp: ${formatDate(selectedReview.timestamp)}`} 
+                variant="outlined"
+              />
+              <Chip 
+                icon={getSentimentIcon(selectedReview.overall_sentiment)}
+                label={`Sentiment: ${selectedReview.overall_sentiment}`} 
+                color={
+                  selectedReview.overall_sentiment === 'POS' ? 'success' : 
+                  selectedReview.overall_sentiment === 'NEG' ? 'error' : 'default'
+                }
+              />
+              {selectedReview.dish_id && (
+                <Chip 
+                  label={`Dish ID: ${selectedReview.dish_id}`} 
+                  variant="outlined"
+                />
+              )}
+            </Box>
+
+            {(selectedReview.ambiance_score > 0 || 
+              selectedReview.food_quality_score > 0 || 
+              selectedReview.service_experience_score > 0) && (
+              <Box sx={{ mt: 2 }}>
+                <Typography variant="subtitle2">Review Scores:</Typography>
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                  {selectedReview.ambiance_score > 0 && (
+                    <Chip 
+                      label={`Ambiance: ${selectedReview.ambiance_score}`} 
+                      size="small" 
+                      variant="outlined"
+                    />
+                  )}
+                  {selectedReview.food_quality_score > 0 && (
+                    <Chip 
+                      label={`Food Quality: ${selectedReview.food_quality_score}`} 
+                      size="small" 
+                      variant="outlined"
+                    />
+                  )}
+                  {selectedReview.service_experience_score > 0 && (
+                    <Chip 
+                      label={`Service: ${selectedReview.service_experience_score}`} 
+                      size="small" 
+                      variant="outlined"
+                    />
+                  )}
+                </Box>
+              </Box>
             )}
           </DialogContent>
           <DialogActions>
-            <Button onClick={closePopup} color="primary">
+            <Button onClick={() => setSelectedReview(null)} color="primary">
               Close
             </Button>
           </DialogActions>
