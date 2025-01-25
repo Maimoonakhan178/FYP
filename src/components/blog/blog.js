@@ -6,7 +6,6 @@ import {
   CardContent,
   Typography,
   Button,
-  Box,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import Header from "../Header/Header"; // Import Header
