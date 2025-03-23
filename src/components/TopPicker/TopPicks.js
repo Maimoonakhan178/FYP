@@ -98,6 +98,7 @@ const TopRestaurants = () => {
         </CardContent>
       </Card>
     );
+
   };
 
   if (loading) return <Typography>Loading restaurants...</Typography>;
@@ -105,18 +106,37 @@ const TopRestaurants = () => {
   return (
     <Box 
       sx={{ 
-        display: 'flex', 
-        flexWrap: 'wrap', 
-        justifyContent: 'center', 
         p: 2 
       }}
     >
-      {restaurants.map(restaurant => (
-        <RestaurantCard 
-          key={restaurant.restaurant_id} 
-          restaurant={restaurant} 
-        />
-      ))}
+      {/* Heading */}
+      <Typography 
+        variant="h4" 
+        component="h2" 
+        sx={{ 
+          textAlign: 'center', 
+          mb: 3, 
+          fontWeight: 'bold' 
+        }}
+      >
+        Top Picks Restaurant
+      </Typography>
+
+      {/* Restaurant Cards */}
+      <Box 
+        sx={{ 
+          display: 'flex', 
+          flexWrap: 'wrap', 
+          justifyContent: 'center' 
+        }}
+      >
+        {restaurants.map((restaurant) => (
+          <RestaurantCard 
+            key={restaurant.restaurant_id} 
+            restaurant={restaurant} 
+          />
+        ))}
+      </Box>
     </Box>
   );
 };

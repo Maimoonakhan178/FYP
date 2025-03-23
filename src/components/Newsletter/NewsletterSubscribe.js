@@ -4,51 +4,54 @@ import animationData from "./Animation.json"; // Path to your animation JSON
 import "./NewsletterSubscribe.css";
 
 const NewsletterSubscribe = () => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  const [email, setEmail] = useState("");
+  // Safely parse user data from localStorage
+  let storedUser;
+  try {
+    storedUser = JSON.parse(localStorage.getItem("user")) || {};
+  } catch (error) {
+    console.error("Error parsing user data from localStorage:", error);
+    storedUser = {}; // Ensure storedUser is always an object
+  }
+
+  const [email, setEmail] = useState(storedUser.email || ""); // Initialize with user email if available
   const [submitted, setSubmitted] = useState(false);
   const [submittedMsg, setSubmittedMsg] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (email || user.email) {
-      const formSubmit = async () => {
-      try {
-        // Create a new FormData object
-        const form = new FormData();
-        form.append("email", user.email ? user.email : email); // Field name and value
 
+    if (!email) {
+      console.log("Please enter a valid email.");
+      return;
+    }
 
-        // Send the POST request
-        const response = await fetch('https://ai.myedbox.com/api/api/newsletter', {
-          method: 'POST',
-          body: form,
-        });
+    try {
+      const form = new FormData();
+      form.append("email", email);
 
-        const data = await response.json();
+      const response = await fetch("https://ai.myedbox.com/api/api/newsletter", {
+        method: "POST",
+        body: form,
+      });
 
-        if (response.ok) {
-          setSubmittedMsg(data.message);
-        } else {
-          console.log(data.message || 'Search failed. Please try again.');
-        }
-      } catch (err) {
-        console.log('An error occurred while searching. Please try again.');
+      const data = await response.json();
+
+      if (response.ok) {
+        setSubmittedMsg(data.message || "Subscription successful!");
+        setSubmitted(true);
+      } else {
+        console.log(data.message || "Subscription failed. Please try again.");
       }
-    }
-    if (email || user.email) {
-      formSubmit();
-      setSubmitted(true);
-    }
-      
+    } catch (err) {
+      console.log("An error occurred while subscribing. Please try again.");
     }
   };
 
   // Lottie animation settings
   const defaultOptions = {
-    loop: true, // Loop the animation
-    autoplay: true, // Autoplay the animation
-    animationData: animationData, // Animation JSON data
+    loop: true,
+    autoplay: true,
+    animationData: animationData,
     rendererSettings: {
       preserveAspectRatio: "xMidYMid slice",
     },
@@ -57,7 +60,6 @@ const NewsletterSubscribe = () => {
   return (
     <div className="newsletter-container">
       <div className="newsletter-animation">
-        {/* Lottie Animation */}
         <Lottie options={defaultOptions} height={250} width={250} />
       </div>
 
@@ -71,7 +73,7 @@ const NewsletterSubscribe = () => {
           <input
             type="email"
             placeholder="Enter your email"
-            value={user.email ? user.email : email}
+            value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
           />

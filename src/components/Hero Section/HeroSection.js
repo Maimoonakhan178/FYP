@@ -69,13 +69,15 @@ const HeroSection = ({ onSearch }) => {
         maxWidth="lg"
         sx={{
           display: "flex",
+          flexDirection: { xs: "column", md: "row" }, // Stack vertically on small screens, side by side on larger screens
           justifyContent: "center",
           alignItems: "center",
           textAlign: "center",
           color: "white",
+          gap: 4, // Add space between the elements
         }}
       >
-        <Box sx={{ flex: 1, paddingRight: 4 }}>
+        <Box sx={{ flex: 1, paddingRight: { md: 4 }, textAlign: { xs: "center", md: "left" } }}>
           {/* Slideshow text */}
           <Box
             className="slideshow"
@@ -95,13 +97,14 @@ const HeroSection = ({ onSearch }) => {
                 fontWeight: "bold",
                 animation: `fadeIn 1s ease-in-out`, // Optional: Add fade-in effect for text
                 textAlign: "center", // Ensure the text is centered
+                fontSize: { xs: "2rem", md: "3rem" }, // Adjust text size based on screen size
               }}
             >
               {taglines[currentSlide]}
             </Typography>
           </Box>
 
-          <Typography variant="h6" sx={{ mt: 3, color: "#FF5722" }}>
+          <Typography variant="h6" sx={{ mt: 3, color: "#FF5722", fontSize: { xs: "1rem", md: "1.5rem" } }}>
             Discover amazing food experiences
           </Typography>
 
@@ -111,6 +114,7 @@ const HeroSection = ({ onSearch }) => {
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
+              width: "100%", // Ensure full width for the inputs
             }}
           >
             <TextField
@@ -125,6 +129,7 @@ const HeroSection = ({ onSearch }) => {
                   borderRadius: 2,
                 },
                 mb: 2,
+                maxWidth: "400px", // Max width for the input
               }}
             />
             <Button
@@ -138,6 +143,7 @@ const HeroSection = ({ onSearch }) => {
                 "&:hover": {
                   backgroundColor: "#e64a19",
                 },
+                maxWidth: "400px", // Max width for the button
               }}
             >
               Search
@@ -152,10 +158,11 @@ const HeroSection = ({ onSearch }) => {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
+            minWidth: "300px", // Ensure the animation doesn't shrink too much
           }}
         >
-          <Lottie options={lottieOptions} height={400} width={400} />{" "}
-          {/* Add Lottie animation */}
+          <Lottie options={lottieOptions} height={300} width={300} />{" "}
+          {/* Add Lottie animation with responsive sizing */}
         </Box>
       </Container>
     </Box>

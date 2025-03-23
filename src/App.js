@@ -16,7 +16,9 @@ import NewsletterSubscribe from "./components/Newsletter/NewsletterSubscribe";
 import TopPicks from "./components/TopPicker/TopPicks";
 import Blog from "./components/blog/blog";
 import Survey from "./components/question/question";
-import Restaurants from "./components/restaurant/restaurant";
+import Restaurants from "./components/Restaurant -temp/restaurant";
+import ChatbotComponent from "./components/chatbot/chatbot"; // Corrected import
+
 // Helper function to check authentication
 const isAuthenticated = () => !!localStorage.getItem("user");
 
@@ -58,16 +60,12 @@ const App = () => {
             <ProtectedRoute>
               <div>
                 <HeroSection onSearch={handleSearch} />
-                {hasSearched ? (
-                  <RestaurantCardSection searchQuery={searchQuery} />
-                ) : (
-                 null
-                )}
-
+                {hasSearched ? <RestaurantCardSection searchQuery={searchQuery} /> : null}
                 <RecentActivity />
                 <TopPicks />
                 <NewsletterSubscribe />
                 <Footer />
+                <ChatbotComponent /> {/* Chatbot is added here */}
               </div>
             </ProtectedRoute>
           }

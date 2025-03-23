@@ -1,78 +1,111 @@
 import React, { useState } from "react";
-import { Button, TextField, Box, Rating, Typography } from "@mui/material";
+import { TextField, Button, Typography, Box, IconButton, Rating } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 
-const WriteReview = ({ onSubmitReview }) => {
+const WriteReview = ({ onClose }) => {
+  const [title, setTitle] = useState("");
   const [review, setReview] = useState("");
-  const [image, setImage] = useState(null);
   const [rating, setRating] = useState(0);
-  const [error, setError] = useState(""); // For displaying error messages
+  const [image, setImage] = useState(null);
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
+  const handleImageUpload = (event) => {
+    const file = event.target.files[0];
     if (file) {
-      setImage(URL.createObjectURL(file)); // Preview the image
+      setImage(URL.createObjectURL(file));
     }
   };
 
-  const handleReviewChange = (e) => {
-    setReview(e.target.value);
-  };
-
-  const handleRatingChange = (event, newValue) => {
-    setRating(newValue);
-  };
-
-  const handleSubmit = () => {
-    if (!review || rating === 0) {
-      setError("Please provide a review and a rating.");
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!title || !review || rating === 0) {
+      alert("Please fill in all fields including rating.");
       return;
     }
-    setError(""); // Clear any previous errors
-    onSubmitReview({ review, rating, image });
+    alert("Thank you for your review!");
+    setTitle("");
+    setReview("");
+    setRating(0);
+    setImage(null);
   };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', maxWidth: '500px', margin: 'auto' }}>
-      <TextField
-        label="Write your review"
-        multiline
-        rows={4}
-        value={review}
-        onChange={handleReviewChange}
-        fullWidth
-        sx={{ marginBottom: 2 }}
-      />
-
-      <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: 2 }}>
-        <Rating
-          name="rating"
-          value={rating}
-          onChange={handleRatingChange}
-          size="large"
-          sx={{ marginRight: 2 }}
-        />
-        <span>Rating: {rating}</span>
-      </Box>
-
-      <input
-        type="file"
-        accept="image/*"
-        onChange={handleImageChange}
-        style={{ marginBottom: "15px" }}
-      />
-      {image && <img src={image} alt="Preview" style={{ width: '100px', marginBottom: '10px' }} />}
-      
-      {error && <Typography color="error" sx={{ marginBottom: 2 }}>{error}</Typography>} {/* Display error message */}
-
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleSubmit}
-        sx={{ borderRadius: 2, width: '100%' }}
+    <>
+      {/* Centered Modal Without Background Blur */}
+      <Box
+        component="form"
+        onSubmit={handleSubmit}
+        onClick={(e) => e.stopPropagation()} // Prevents modal from closing when clicked inside
+        sx={{
+          position: "fixed",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: 400,
+          bgcolor: "white",
+          p: 3,
+          borderRadius: 2,
+          boxShadow: 3,
+          zIndex: 1000,
+        }}
       >
-        Submit Review
-      </Button>
-    </Box>
+        <IconButton
+          onClick={onClose}
+          sx={{ position: "absolute", top: 8, right: 8 }}
+        >
+          <CloseIcon />
+        </IconButton>
+        <Typography variant="h6" gutterBottom fontWeight="bold">
+          Write a Review
+        </Typography>
+        <Rating
+          value={rating}
+          onChange={(event, newValue) => setRating(newValue)}
+          sx={{ mb: 2 }}
+        />
+        <TextField
+          fullWidth
+          label="Title"
+          variant="outlined"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          sx={{ mb: 2 }}
+        />
+        <TextField
+          fullWidth
+          label="Review"
+          multiline
+          rows={4}
+          value={review}
+          onChange={(e) => setReview(e.target.value)}
+          variant="outlined"
+          sx={{ mb: 2 }}
+        />
+        <Button variant="contained" component="label" fullWidth sx={{ mb: 2 }}>
+          Upload Image
+          <input type="file" hidden accept="image/*" onChange={handleImageUpload} />
+        </Button>
+
+        {/* Image Preview */}
+        {image && (
+          <Box sx={{ textAlign: "center", mb: 2 }}>
+            <img
+              src={image}
+              alt="Uploaded Preview"
+              style={{
+                width: "100%",
+                maxHeight: 150,
+                objectFit: "cover",
+                borderRadius: 4,
+              }}
+            />
+          </Box>
+        )}
+
+        <Button type="submit" variant="contained" color="primary" fullWidth>
+          Submit
+        </Button>
+      </Box>
+    </>
   );
 };
 

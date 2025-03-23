@@ -1,29 +1,31 @@
-import React, { useEffect, useState } from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
-import Logo from "./Logo.webp";
-import "./Header.css";
-import { Button } from "@mui/material";
+import React, { useState, useEffect } from "react";
+import {
+  AppBar,
+  Toolbar,
+  IconButton,
+  Button,
+  Drawer,
+  Box,
+  Container,
+  Avatar,
+  Stack,
+  Typography,
+} from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
-import WriteReview from "./writeareview"; // Import WriteReview component
-import Avatar from "@mui/material/Avatar"; // Import Avatar component
-import Stack from "@mui/material/Stack"; // Import Stack component
+import Logo from "./Logo.png";
 
-// Helper function to generate color based on string (used for Avatar)
+// Helper function: Generate color-based Avatar
 function stringToColor(string) {
   let hash = 0;
-  let i;
-
-  for (i = 0; i < string.length; i++) {
+  for (let i = 0; i < string.length; i++) {
     hash = string.charCodeAt(i) + ((hash << 5) - hash);
   }
-
   let color = "#";
-
-  for (i = 0; i < 3; i++) {
+  for (let i = 0; i < 3; i++) {
     const value = (hash >> (i * 8)) & 0xff;
     color += `00${value.toString(16)}`.slice(-2);
   }
-
   return color;
 }
 
@@ -31,61 +33,27 @@ function stringAvatar(name) {
   return {
     sx: {
       bgcolor: stringToColor(name),
+      color: "white",
+      fontWeight: "bold",
     },
     children: `${name[0].toUpperCase()}`,
   };
 }
 
 const Header = () => {
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
-  const [showModal, setShowModal] = useState(false);
-  const [location, setLocation] = useState(null);
-  const [locationName, setLocationName] = useState(""); // Store location name
-
-  useEffect(() => {
-    if (user && location) {
-      // Update location in localStorage
-      user.location = location;
-      localStorage.setItem("user", JSON.stringify(user));
-    }
-  }, [location, user]);
-
-  const getLocationName = async (latitude, longitude) => {
-    const API_KEY = process.env.REACT_APP_GOOGLE_API_KEY;
-    try {
-      const response = await fetch(
-        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${API_KEY}`
-      );
-      const data = await response.json();
-
-      if (data.status === "OK" && data.results.length > 0) {
-        const formattedAddress = data.results[0].formatted_address;
-        setLocationName(formattedAddress); // Set the location name
-      } else {
-        console.error("No location found for these coordinates");
-      }
-    } catch (error) {
-      console.error("Error fetching location data:", error);
-    }
-  };
+  const [locationName, setLocationName] = useState("");
 
   const handleFetchLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          const { latitude, longitude } = position.coords;
-          const locationString = `${latitude}, ${longitude}`;
-          setLocation(locationString);
-          getLocationName(latitude, longitude);
+          setLocationName(`Lat: ${position.coords.latitude}, Lng: ${position.coords.longitude}`);
         },
         (error) => {
           console.error("Location error:", error);
-          alert("Location unavailable. Enable location services.");
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 5000,
-          maximumAge: 0
+          alert("Enable location services.");
         }
       );
     } else {
@@ -93,133 +61,135 @@ const Header = () => {
     }
   };
 
-  const handleShowModal = () => setShowModal(true);
-  const handleCloseModal = () => setShowModal(false);
-
-  // Handle Logout
   const handleLogout = () => {
     localStorage.removeItem("user");
-    setUser(null); // Reset user state
+    setUser(null);
   };
 
   return (
-    <header className="navbar navbar-expand-lg navbar-light bg-white border-bottom">
-      <div className="container-fluid">
-        {/* Logo */}
-        <a className="navbar-brand" href="/">
-          <img src={Logo} alt="Logo" style={{ height: "40px" }} />
-        </a>
-
-        {/* Navbar Toggler for Mobile */}
-        <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-          aria-controls="navbarNav"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
-
-        {/* Collapsible Navbar Links */}
-        <div className="collapse navbar-collapse" id="navbarNav">
-          <nav className="navbar-nav me-auto mb-2 mb-lg-0">
-            <a className="nav-link" href="/restaurant">
-              Restaurants
-            </a>
-            <a className="nav-link" href="/blog">
-              Blog
-            </a>
-            <a className="nav-link" href="/survey">
-              Survey
-            </a>
-          </nav>
-        </div>
-
-        {/* Location Button and User Actions */}
-        <div className="d-flex align-items-center gap-3">
-          <Button
-            variant="contained"
-            startIcon={<LocationOnIcon />}
-            onClick={handleFetchLocation}
-            sx={{
-              background: "#d32323",
-              color: "white",
-              borderRadius: "20px",
-              padding: "10px 20px",
-              boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)",
-              transition: "transform 0.2s ease",
-              "&:hover": {
-                background: "linear-gradient(45deg, #e64a19, #f57c00)",
-                transform: "scale(1.05)",
-              },
-            }}
-          >
-            Get Location
-          </Button>
-
-          {locationName && (
-            <span className="text-secondary" style={{ marginLeft: "10px" }}>
-              {locationName}
-            </span>
-          )}
-
-          <a className="nav-link d-none d-md-block" href="#" onClick={handleShowModal}>
-            Write a Review
-          </a>
-
-          {user ? (
-            <div className="d-flex align-items-center gap-3">
-              <Stack direction="row" spacing={2}>
-                <Avatar {...stringAvatar(user.name || "User")} />
-              </Stack>
-              <Button variant="outlined" onClick={handleLogout}>
-                Log Out
+    <AppBar
+      position="static"
+      sx={{
+        background: "#FFD700",
+        borderRadius: "10px",
+        padding: "8px 0",
+        boxShadow: "0px 4px 10px rgba(0,0,0,0.1)",
+      }}
+    >
+      <Container maxWidth="lg">
+        <Toolbar sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          {/* Left Side - Navigation */}
+          <Box sx={{ display: { xs: "none", md: "flex" }, gap: 3 }}>
+            {["Home", "Restaurants", "Recommendation", "Contact"].map((item) => (
+              <Button key={item} sx={{ fontSize: "16px", fontWeight: "bold", color: "#000", textTransform: "capitalize", transition: "0.3s", "&:hover": { color: "#D84315" } }}>
+                {item}
               </Button>
-            </div>
-          ) : (
-            <a className="btn btn-outline-secondary" href="/login">
-              Log In
-            </a>
-          )}
-        </div>
-      </div>
+            ))}
+          </Box>
 
-      {/* Modal for Write a Review */}
-      {showModal && (
-        <div
-          className="modal show"
-          style={{ display: "block" }}
-          aria-labelledby="writeReviewModal"
-          aria-hidden="true"
-        >
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title" id="writeReviewModal">
-                  Write a Review
-                </h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={handleCloseModal}
-                  aria-label="Close"
-                ></button>
-              </div>
-              <div className="modal-body">
-                <WriteReview
-                  onSubmitReview={(reviewData) =>
-                    console.log("Review submitted:", reviewData)
-                  }
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </header>
+          <img
+  src={Logo}
+  alt="Food Junction"
+  style={{
+    height: 62,
+    width: 60, // Ensures it's a perfect circle
+    borderRadius: "50%", // Makes the image round
+    objectFit: "cover", // Ensures the image fills the round shape properly
+    margin: "0 auto",
+  }}
+/>
+
+          {/* Right Side - Buttons & Profile */}
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <Button
+              variant="contained"
+              startIcon={<LocationOnIcon />}
+              onClick={handleFetchLocation}
+              sx={{
+                background: "#d32323",
+                color: "white",
+                borderRadius: "20px",
+                padding: "10px 20px",
+                "&:hover": { background: "#E64A19" },
+              }}
+            >
+              Get Location
+            </Button>
+
+            <Button
+              variant="contained"
+              sx={{
+                background: "#FF5722",
+                color: "white",
+                borderRadius: "20px",
+                padding: "8px 16px",
+                fontSize: "14px",
+                fontWeight: "bold",
+                "&:hover": { background: "#E64A19" },
+              }}
+              onClick={() => alert("Write a Review Modal Placeholder")}
+            >
+              Write a Review
+            </Button>
+
+            {user ? (
+              <Stack direction="row" spacing={1} alignItems="center">
+                <Avatar {...stringAvatar(user.name || "User")} />
+                <Button
+                  variant="outlined"
+                  onClick={handleLogout}
+                  sx={{
+                    borderColor: "#0000",
+                    color: "#0000",
+                    borderRadius: "8px",
+                    "&:hover": { bgcolor: "#d32323", color: "#fffff" },
+                  }}
+                >
+                  Log Out
+                </Button>
+              </Stack>
+            ) : (
+              <Button
+              variant="contained"
+              href="/login"
+              sx={{
+                backgroundColor: "#4CAF50", // Green background
+                color: "#fff", // White text
+                borderRadius: "8px",
+                fontWeight: "bold",
+                padding: "8px 16px",
+                boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)", // Adding shadow
+                transition: "0.3s",
+                "&:hover": {
+                  backgroundColor: "#45A049", // Darker green on hover
+                  boxShadow: "0px 6px 10px rgba(0, 0, 0, 0.15)", // Stronger shadow on hover
+                },
+              }}
+            >
+              Log In
+            </Button>
+            
+            
+            )}
+          </Box>
+
+          {/* Mobile Drawer */}
+          <IconButton edge="start" color="inherit" onClick={() => setDrawerOpen(true)} sx={{ display: { md: "none" } }}>
+            <MenuIcon />
+          </IconButton>
+
+          <Drawer anchor="left" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
+            <Box sx={{ width: 250, p: 2 }}>
+              {["Home", "Restaurants", "Recommendation", "Contact"].map((item) => (
+                <Button key={item} onClick={() => setDrawerOpen(false)} sx={{ display: "block", textAlign: "left", fontSize: "18px", p: "8px" }}>
+                  {item}
+                </Button>
+              ))}
+            </Box>
+          </Drawer>
+        </Toolbar>
+      </Container>
+    </AppBar>
   );
 };
 
