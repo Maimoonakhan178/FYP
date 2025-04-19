@@ -1,13 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
+import { Link } from "react-router-dom"; // Import Link for navigation
 import Lottie from "react-lottie";
 import animationData from "./Animation.json";
 import { IconButton } from "@mui/material";
-import {
-  Facebook,
-  Twitter,
-  Instagram,
-  LinkedIn,
-} from "@mui/icons-material";
+import { Facebook, Twitter, Instagram, LinkedIn } from "@mui/icons-material";
 
 const Footer = () => {
   const defaultOptions = {
@@ -20,13 +16,14 @@ const Footer = () => {
   return (
     <footer style={styles.footer}>
       <div style={styles.container}>
-        {/* Left Section: Navigation */}
+        
+        {/* Left Section: Navigation Links */}
         <div style={styles.navSection}>
           <ul style={styles.navList}>
-            <li style={styles.navItem}>Home</li>
-            <li style={styles.navItem}>Restaurants</li>
-            <li style={styles.navItem}>Recommendation</li>
-            <li style={styles.navItem}>Contact</li>
+            <li style={styles.navItem}><Link to="/" style={styles.link}>Home</Link></li>
+            <li style={styles.navItem}><Link to="/restaurant" style={styles.link}>Restaurants</Link></li>
+            <li style={styles.navItem}><Link to="/restaurantrecommendation" style={styles.link}>Restaurant Recommendation</Link></li>
+            <li style={styles.navItem}><Link to="/survey" style={styles.link}>Survey</Link></li>
           </ul>
         </div>
 
@@ -50,11 +47,13 @@ const Footer = () => {
 };
 const styles = {
   footer: {
-    backgroundColor: "#FF5722", // Orange color
+    backgroundColor: "#FF5722", 
     color: "white",
-    padding: "10px 20px", // Further reduced padding
+    padding: "15px 20px", 
     textAlign: "center",
-    borderTop: "2px solid #e67e22", // Subtle border
+    borderTop: "2px solid #e67e22",
+    borderRadius: "20px 20px 0 0", // Rounded only at the top
+    marginTop: "20px", // Adds spacing between content and footer
   },
 
   container: {
@@ -70,25 +69,40 @@ const styles = {
     listStyle: "none",
     padding: 0,
     display: "flex",
-    gap: "15px", // Reduced gap
+    gap: "15px", 
+  },
+
+  navItem: {
+    fontSize: "18px",
+    fontWeight: "bold",
+  },
+
+  link: {
+    textDecoration: "none",
+    color: "white",
+    transition: "color 0.3s",
+  },
+
+  linkHover: {
+    color: "#FFD700", // Gold on hover
   },
 
   animation: {
-    marginBottom: "5px", // Less spacing below animation
+    marginBottom: "5px", 
   },
 
   copyright: {
-    fontSize: "12px", // Smaller text
-    marginBottom: "5px", // Less space below text
+    fontSize: "12px", 
+    marginBottom: "5px", 
   },
 
   socialIcons: {
     display: "flex",
-    gap: "8px", // Less spacing between icons
+    gap: "8px", 
   },
 
   icon: {
-    fontSize: "20px", // Slightly smaller icons
+    fontSize: "20px", 
   },
 };
 

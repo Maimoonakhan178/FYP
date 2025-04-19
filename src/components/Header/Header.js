@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import {
   AppBar,
   Toolbar,
@@ -9,107 +10,91 @@ import {
   Container,
   Avatar,
   Stack,
-  Typography,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import Logo from "./Logo.png";
 
-// Helper function: Generate color-based Avatar
-function stringToColor(string) {
-  let hash = 0;
-  for (let i = 0; i < string.length; i++) {
-    hash = string.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  let color = "#";
-  for (let i = 0; i < 3; i++) {
-    const value = (hash >> (i * 8)) & 0xff;
-    color += `00${value.toString(16)}`.slice(-2);
-  }
-  return color;
-}
-
-function stringAvatar(name) {
-  return {
-    sx: {
-      bgcolor: stringToColor(name),
-      color: "white",
-      fontWeight: "bold",
-    },
-    children: `${name[0].toUpperCase()}`,
-  };
-}
-
 const Header = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
-  const [locationName, setLocationName] = useState("");
+  const [scrolled, setScrolled] = useState(false);
 
-  const handleFetchLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setLocationName(`Lat: ${position.coords.latitude}, Lng: ${position.coords.longitude}`);
-        },
-        (error) => {
-          console.error("Location error:", error);
-          alert("Enable location services.");
-        }
-      );
-    } else {
-      alert("Geolocation not supported");
-    }
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    setUser(null);
-  };
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
     <AppBar
-      position="static"
+      position="fixed"
       sx={{
-        background: "#FFD700",
-        borderRadius: "10px",
+        top: "10px", // Moves it closer to the top
+        left: "50%",
+
+        transform: "translateX(-50%)", // Centers it horizontally
+        width: "85%", // Slightly smaller for a floating effect
+        background: scrolled
+          ? "rgba(255, 215, 0, 0.6)" // More transparency when scrolled
+          : "rgba(255, 215, 0, 0.75)", // Slightly transparent initially
+        backdropFilter: "blur(20px)", // Stronger blur effect
+        boxShadow: "0px 6px 20px rgba(0, 0, 0, 0.2)", // Floating effect
+        borderRadius: "14px", // More refined roundness
+        transition: "0.3s ease-in-out",
         padding: "8px 0",
-        boxShadow: "0px 4px 10px rgba(0,0,0,0.1)",
       }}
     >
       <Container maxWidth="lg">
         <Toolbar sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           {/* Left Side - Navigation */}
           <Box sx={{ display: { xs: "none", md: "flex" }, gap: 3 }}>
-            {["Home", "Restaurants", "Recommendation", "Contact"].map((item) => (
-              <Button key={item} sx={{ fontSize: "16px", fontWeight: "bold", color: "#000", textTransform: "capitalize", transition: "0.3s", "&:hover": { color: "#D84315" } }}>
-                {item}
+            {[
+              { name: "Home", path: "/" },
+              { name: "Restaurants", path: "/restaurant" },
+              { name: "Recommendation", path: "/recommendation" },
+              { name: "Contact", path: "/contact" },
+            ].map((item) => (
+              <Button
+                key={item.name}
+                component={Link}
+                to={item.path}
+                sx={{
+                  fontSize: "16px",
+                  fontWeight: "bold",
+                  color: "#000",
+                  textTransform: "capitalize",
+                  "&:hover": { color: "#D84315" },
+                }}
+              >
+                {item.name}
               </Button>
             ))}
           </Box>
 
+          {/* Logo */}
           <img
-  src={Logo}
-  alt="Food Junction"
-  style={{
-    height: 62,
-    width: 60, // Ensures it's a perfect circle
-    borderRadius: "50%", // Makes the image round
-    objectFit: "cover", // Ensures the image fills the round shape properly
-    margin: "0 auto",
-  }}
-/>
+            src={Logo}
+            alt="Food Junction"
+            style={{
+              height: 55,
+              width: 55,
+              borderRadius: "50%",
+              objectFit: "cover",
+            }}
+          />
 
-          {/* Right Side - Buttons & Profile */}
+          {/* Right Side - Buttons */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
             <Button
               variant="contained"
               startIcon={<LocationOnIcon />}
-              onClick={handleFetchLocation}
               sx={{
                 background: "#d32323",
                 color: "white",
                 borderRadius: "20px",
-                padding: "10px 20px",
                 "&:hover": { background: "#E64A19" },
               }}
             >
@@ -122,27 +107,26 @@ const Header = () => {
                 background: "#FF5722",
                 color: "white",
                 borderRadius: "20px",
-                padding: "8px 16px",
-                fontSize: "14px",
                 fontWeight: "bold",
                 "&:hover": { background: "#E64A19" },
               }}
-              onClick={() => alert("Write a Review Modal Placeholder")}
             >
               Write a Review
             </Button>
 
             {user ? (
               <Stack direction="row" spacing={1} alignItems="center">
-                <Avatar {...stringAvatar(user.name || "User")} />
+                <Avatar>{user.name[0]}</Avatar>
                 <Button
                   variant="outlined"
-                  onClick={handleLogout}
+                  onClick={() => {
+                    localStorage.removeItem("user");
+                    setUser(null);
+                  }}
                   sx={{
-                    borderColor: "#0000",
-                    color: "#0000",
-                    borderRadius: "8px",
-                    "&:hover": { bgcolor: "#d32323", color: "#fffff" },
+                    borderColor: "#000",
+                    color: "#000",
+                    "&:hover": { bgcolor: "#d32323", color: "#fff" },
                   }}
                 >
                   Log Out
@@ -150,26 +134,19 @@ const Header = () => {
               </Stack>
             ) : (
               <Button
-              variant="contained"
-              href="/login"
-              sx={{
-                backgroundColor: "#4CAF50", // Green background
-                color: "#fff", // White text
-                borderRadius: "8px",
-                fontWeight: "bold",
-                padding: "8px 16px",
-                boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)", // Adding shadow
-                transition: "0.3s",
-                "&:hover": {
-                  backgroundColor: "#45A049", // Darker green on hover
-                  boxShadow: "0px 6px 10px rgba(0, 0, 0, 0.15)", // Stronger shadow on hover
-                },
-              }}
-            >
-              Log In
-            </Button>
-            
-            
+                variant="contained"
+                component={Link}
+                to="/login"
+                sx={{
+                  backgroundColor: "#4CAF50",
+                  color: "#fff",
+                  borderRadius: "8px",
+                  fontWeight: "bold",
+                  "&:hover": { backgroundColor: "#45A049" },
+                }}
+              >
+                Log In
+              </Button>
             )}
           </Box>
 
@@ -180,9 +157,14 @@ const Header = () => {
 
           <Drawer anchor="left" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
             <Box sx={{ width: 250, p: 2 }}>
-              {["Home", "Restaurants", "Recommendation", "Contact"].map((item) => (
-                <Button key={item} onClick={() => setDrawerOpen(false)} sx={{ display: "block", textAlign: "left", fontSize: "18px", p: "8px" }}>
-                  {item}
+              {[
+                { name: "Home", path: "/" },
+                { name: "Restaurants", path: "/restaurant" },
+                { name: "Recommendation", path: "/recommendation" },
+                { name: "Contact", path: "/contact" },
+              ].map((item) => (
+                <Button key={item.name} component={Link} to={item.path} sx={{ display: "block", textAlign: "left" }}>
+                  {item.name}
                 </Button>
               ))}
             </Box>

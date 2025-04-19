@@ -142,8 +142,8 @@ export default function Restaurants() {
 
   return (
     <Container>
-      <Box sx={{ marginBottom: 4 }}>
-        <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+      <Box sx={{ marginBottom: 5}}>
+        <Typography variant="h4" marginTop={14} sx={{ fontWeight: "bold" }} textAlign={"center"}>
           Explore the best dining experiences in Karachi
         </Typography>
         <Box sx={{ marginTop: 2 }}>

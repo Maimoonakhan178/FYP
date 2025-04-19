@@ -1,12 +1,5 @@
 import React, { useState } from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
-import Signup from "./components/Signup/signup";
-import Login from "./components/Signup/login";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import HeroSection from "./components/Hero Section/HeroSection";
 import Header from "./components/Header/Header";
 import Footer from "./components/Footer/Footer";
@@ -14,25 +7,16 @@ import RecentActivity from "./components/Recent activity/RecentActivity";
 import RestaurantCardSection from "./components/Restaurant Card Section/RestaurantCardSection";
 import NewsletterSubscribe from "./components/Newsletter/NewsletterSubscribe";
 import TopPicks from "./components/TopPicker/TopPicks";
-import Blog from "./components/blog/blog";
-import Survey from "./components/question/question";
+import RestaurantRecommendationCarousel from './components/RestaurantRecommendation/RestaurantRecommendationCarousel';
+import Survey from "./components/question/Survey";
 import Restaurants from "./components/Restaurant -temp/restaurant";
-import ChatbotComponent from "./components/chatbot/chatbot"; // Corrected import
+import ChatbotComponent from "./components/chatbot/chatbot";
+import Recommendation from "./components/Recommendation/Recommendation";
+import Contact from "./components/Contact/Contact";
+import RestaurantProfile  from "./components/Restaurant -temp/restaurantprofile";
 
-// Helper function to check authentication
-const isAuthenticated = () => !!localStorage.getItem("user");
 
-// ProtectedRoute component to protect routes and include Header
-const ProtectedRoute = ({ children }) => {
-  return isAuthenticated() ? (
-    <>
-      <Header /> {/* Only render Header if authenticated */}
-      {children} {/* Render children (protected routes) */}
-    </>
-  ) : (
-    <Navigate to="/login" /> // Redirect to login if not authenticated
-  );
-};
+
 
 const App = () => {
   const [searchQuery, setSearchQuery] = useState(""); // Tracks the search query
@@ -45,34 +29,37 @@ const App = () => {
 
   return (
     <Router>
+      <Header /> {/* Header always visible */}
       <Routes>
-        {/* Public Routes */}
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/blog" element={<Blog />} />
-        <Route path="/survey" element={<Survey />} />
-        <Route path="/restaurant" element={<Restaurants />} />
-
-        {/* Protected Routes */}
+        {/* Home Route */}
         <Route
           path="/"
           element={
-            <ProtectedRoute>
-              <div>
-                <HeroSection onSearch={handleSearch} />
-                {hasSearched ? <RestaurantCardSection searchQuery={searchQuery} /> : null}
-                <RecentActivity />
-                <TopPicks />
-                <NewsletterSubscribe />
-                <Footer />
-                <ChatbotComponent /> {/* Chatbot is added here */}
-              </div>
-            </ProtectedRoute>
+            <>
+              <HeroSection onSearch={handleSearch} />
+              {hasSearched && <RestaurantCardSection searchQuery={searchQuery} />}
+              <RecentActivity />
+              <TopPicks />
+              <NewsletterSubscribe />
+              <Footer />
+              <ChatbotComponent /> {/* Chatbot added */}
+            </>
           }
         />
 
-        {/* Redirect unknown routes to /signup */}
-        <Route path="*" element={<Navigate to="/signup" />} />
+        {/* Header Routes */}
+        <Route path="/restaurant" element={<><Restaurants /><Footer /></>} />
+        <Route path="/restaurant" element={<><Restaurants /><Footer /></>} />
+        <Route path="/recommendation" element={<><Recommendation /><Footer /></>} />
+        <Route path="/contact" element={<><Contact /><Footer /></>} />
+
+        {/* Footer Routes */}
+
+        <Route path="/survey" element={<><Survey /><Footer /></>} />
+        <Route path="/restaurantrecommendation" element={<><RestaurantRecommendationCarousel /><Footer /></>} />
+
+        {/* Redirect unknown routes to home */}
+        <Route path="*" element={<><HeroSection onSearch={handleSearch} /><Footer /></>} />
       </Routes>
     </Router>
   );

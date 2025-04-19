@@ -13,8 +13,7 @@ import {
   Zoom,
 } from "@mui/material";
 import { keyframes } from "@mui/system";
-import Header from "../Header/Header";
-import Footer from "../Footer/Footer";
+
 import { questions, foodRecommendations } from "./data/quizData";
 
 // Add subtle hover animation for buttons
@@ -76,7 +75,7 @@ const SimpleFlavorProfileQuiz = () => {
 
   return (
     <>
-      <Header />
+  
       <Container
         sx={{
           mt: 4,
@@ -91,6 +90,7 @@ const SimpleFlavorProfileQuiz = () => {
             fontWeight: "bold",
             animation: `${slideIn} 1s ease-in-out`,
           }}
+          marginTop={13}
         >
           Flavor Profile Quiz
         </Typography>
@@ -207,7 +207,7 @@ const SimpleFlavorProfileQuiz = () => {
           </Zoom>
         )}
       </Container>
-      <Footer />
+
     </>
   );
 };
