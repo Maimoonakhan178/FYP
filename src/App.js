@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import HeroSection from "./components/Hero Section/HeroSection";
 import Header from "./components/Header/Header";
 import Footer from "./components/Footer/Footer";
@@ -13,25 +13,47 @@ import Restaurants from "./components/Restaurant -temp/restaurant";
 import ChatbotComponent from "./components/chatbot/chatbot";
 import Recommendation from "./components/Recommendation/Recommendation";
 import Contact from "./components/Contact/Contact";
-import RestaurantProfile  from "./components/Restaurant -temp/restaurantprofile";
-
-
-
+import RestaurantProfile from "./components/Restaurant -temp/restaurantprofile";
+import SignUpPage from "./components/Signup/signup";
+import LoginPage from './components/Signup/login';
+import FoodSelection from './components/FoodSelection/FoodSelectionPage';
 
 const App = () => {
-  const [searchQuery, setSearchQuery] = useState(""); // Tracks the search query
-  const [hasSearched, setHasSearched] = useState(false); // Tracks if the user has searched
+  const [searchQuery, setSearchQuery] = useState(""); 
+  const [hasSearched, setHasSearched] = useState(false); 
+  const [loggedIn, setLoggedIn] = useState(false);  // Declare loggedIn state here
 
   const handleSearch = (query) => {
-    setSearchQuery(query || ""); // Update query, fallback to empty string if undefined
-    setHasSearched(true); // Mark that a search was performed
+    setSearchQuery(query || ""); 
+    setHasSearched(true); 
   };
 
   return (
     <Router>
-      <Header /> {/* Header always visible */}
+      <MainRoutes 
+        handleSearch={handleSearch} 
+        searchQuery={searchQuery} 
+        hasSearched={hasSearched} 
+        loggedIn={loggedIn}  // Pass loggedIn as prop
+        setLoggedIn={setLoggedIn}  // Pass setLoggedIn as prop
+      />
+    </Router>
+  );
+};
+
+// Main routes component
+const MainRoutes = ({ handleSearch, searchQuery, hasSearched, loggedIn, setLoggedIn }) => {
+  const location = useLocation();
+
+  // Check if the current page is '/food-selection' or '/login' or '/signup' to avoid rendering the header
+  const isNoHeaderPage = location.pathname === "/food-selection" || location.pathname === "/login" || location.pathname === "/signup";
+
+  return (
+    <>
+      {/* Render header only if it's not the food-selection, login, or signup page */}
+      {!isNoHeaderPage && <Header />}
+
       <Routes>
-        {/* Home Route */}
         <Route
           path="/"
           element={
@@ -42,26 +64,28 @@ const App = () => {
               <TopPicks />
               <NewsletterSubscribe />
               <Footer />
-              <ChatbotComponent /> {/* Chatbot added */}
+              <ChatbotComponent />
             </>
           }
         />
 
-        {/* Header Routes */}
-        <Route path="/restaurant" element={<><Restaurants /><Footer /></>} />
         <Route path="/restaurant" element={<><Restaurants /><Footer /></>} />
         <Route path="/recommendation" element={<><Recommendation /><Footer /></>} />
         <Route path="/contact" element={<><Contact /><Footer /></>} />
-
-        {/* Footer Routes */}
-
         <Route path="/survey" element={<><Survey /><Footer /></>} />
         <Route path="/restaurantrecommendation" element={<><RestaurantRecommendationCarousel /><Footer /></>} />
+
+        {/* Routes for Signup and Login */}
+        <Route path="/signup" element={<SignUpPage />} />
+        <Route path="/login" element={<LoginPage setLoggedIn={setLoggedIn} />} />
+        
+        {/* Conditionally render the food selection page */}
+        {loggedIn && <Route path="/food-selection" element={<FoodSelection />} />}
 
         {/* Redirect unknown routes to home */}
         <Route path="*" element={<><HeroSection onSearch={handleSearch} /><Footer /></>} />
       </Routes>
-    </Router>
+    </>
   );
 };
 

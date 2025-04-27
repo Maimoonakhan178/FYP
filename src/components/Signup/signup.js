@@ -1,270 +1,225 @@
 import React, { useState } from 'react';
+import { Box, Button, Paper, TextField, Typography, Link } from '@mui/material';
+import { motion } from 'framer-motion';
+import Lottie from 'react-lottie';  // Import react-lottie
+import animationData from './Animation12.json'; // Path to your Lottie JSON file
 
-const FoodieSignUpPage = () => {
+const SignUpPage = () => {
   const [formData, setFormData] = useState({
     username: '',
     email: '',
     password: '',
-    age: '',
-    favoriteCuisine: '',
-    dietaryRestrictions: [],
-    spiceTolerance: '',
-    preferredDiningStyle: '',
-    favoriteIngredients: '',
-    allergies: '',
-    priceRange: '',
-    frequencyOfDiningOut: ''
   });
 
+  const [loading, setLoading] = useState(false);
+
   const handleChange = (e) => {
-    const { name, value, type } = e.target;
-    if (type === 'checkbox') {
-      const updatedRestrictions = [...formData.dietaryRestrictions];
-      if (e.target.checked) {
-        updatedRestrictions.push(value);
-      } else {
-        const index = updatedRestrictions.indexOf(value);
-        if (index > -1) {
-          updatedRestrictions.splice(index, 1);
-        }
-      }
-      setFormData(prevState => ({
-        ...prevState,
-        dietaryRestrictions: updatedRestrictions
-      }));
-    } else {
-      setFormData(prevState => ({
-        ...prevState,
-        [name]: value
-      }));
-    }
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
-    // Here you would typically send the data to your backend
-    // and generate food and restaurant recommendations based on the preferences
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      alert('Signup Successful!');
+    }, 2000);
   };
 
-  const styles = {
-    container: {
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      padding: '20px',
-      fontFamily: 'Arial, sans-serif',
-      maxWidth: '600px',
-      margin: '0 auto'
+  const defaultOptions = {
+    loop: true,
+    autoplay: true, // Auto play the animation
+    animationData: animationData, // The Lottie JSON data
+    rendererSettings: {
+      preserveAspectRatio: 'xMidYMid slice',
     },
-    form: {
-      display: 'flex',
-      flexDirection: 'column',
-      width: '100%'
-    },
-    input: {
-      margin: '10px 0',
-      padding: '10px',
-      fontSize: '16px',
-      borderRadius: '5px',
-      border: '1px solid #ddd'
-    },
-    select: {
-      margin: '10px 0',
-      padding: '10px',
-      fontSize: '16px',
-      borderRadius: '5px',
-      border: '1px solid #ddd'
-    },
-    checkboxGroup: {
-      display: 'flex',
-      flexWrap: 'wrap',
-      gap: '10px',
-      margin: '10px 0'
-    },
-    checkbox: {
-      display: 'flex',
-      alignItems: 'center'
-    },
-    button: {
-      margin: '20px 0',
-      padding: '10px',
-      fontSize: '18px',
-      color: 'white',
-      backgroundColor: '#007bff',
-      border: 'none',
-      borderRadius: '5px',
-      cursor: 'pointer'
-    },
-    label: {
-      fontWeight: 'bold',
-      marginTop: '10px'
-    }
   };
 
   return (
-    <div style={styles.container}>
-      <h1>Foodie Sign Up</h1>
-      <form onSubmit={handleSubmit} style={styles.form}>
-        <input
-          type="text"
-          name="username"
-          placeholder="Username"
-          value={formData.username}
-          onChange={handleChange}
-          style={styles.input}
-          required
-        />
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={formData.email}
-          onChange={handleChange}
-          style={styles.input}
-          required
-        />
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
-          style={styles.input}
-          required
-        />
-        <input
-          type="number"
-          name="age"
-          placeholder="Age"
-          value={formData.age}
-          onChange={handleChange}
-          style={styles.input}
-          required
-        />
-        <label style={styles.label}>Favorite Cuisine</label>
-        <select
-          name="favoriteCuisine"
-          value={formData.favoriteCuisine}
-          onChange={handleChange}
-          style={styles.select}
-          required
+    <Box
+      component={motion.div}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 1 }}
+      sx={{
+        minHeight: '100vh',
+        backgroundColor: '#f9f9f9', // Light gray background
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
+      <Paper
+        elevation={3}
+        component={motion.div}
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.8, delay: 0.2 }}
+        sx={{
+          width: 380,
+          borderRadius: 4,
+          p: 4,
+          boxShadow: '0px 10px 30px rgba(0,0,0,0.1)',
+          backgroundColor: '#ffffff', // Pure white background
+        }}
+      >
+        <Typography
+          variant="h4"
+          align="center"
+          mb={1}
+          color="textPrimary"
+          component={motion.h4}
+          initial={{ y: -30, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3 }}
         >
-          <option value="">Select Favorite Cuisine</option>
-          <option value="italian">Italian</option>
-          <option value="chinese">Chinese</option>
-          <option value="mexican">Mexican</option>
-          <option value="japanese">Japanese</option>
-          <option value="indian">Indian</option>
-          <option value="french">French</option>
-          <option value="thai">Thai</option>
-          <option value="american">American</option>
-        </select>
-        
-        <label style={styles.label}>Dietary Restrictions</label>
-        <div style={styles.checkboxGroup}>
-          {['Vegetarian', 'Vegan', 'Gluten-Free', 'Lactose-Free', 'Kosher', 'Halal'].map((restriction) => (
-            <label key={restriction} style={styles.checkbox}>
-              <input
-                type="checkbox"
-                name="dietaryRestrictions"
-                value={restriction.toLowerCase()}
-                checked={formData.dietaryRestrictions.includes(restriction.toLowerCase())}
-                onChange={handleChange}
-              />
-              {restriction}
-            </label>
-          ))}
-        </div>
+          Create Account
+        </Typography>
 
-        <label style={styles.label}>Spice Tolerance</label>
-        <select
-          name="spiceTolerance"
-          value={formData.spiceTolerance}
-          onChange={handleChange}
-          style={styles.select}
-          required
-        >
-          <option value="">Select Spice Tolerance</option>
-          <option value="mild">Mild</option>
-          <option value="medium">Medium</option>
-          <option value="hot">Hot</option>
-          <option value="extraHot">Extra Hot</option>
-        </select>
+        {/* Lottie Animation */}
+        <Lottie options={defaultOptions} height={200} width={150} style={{ marginBottom: '20px' }} />
 
-        <label style={styles.label}>Preferred Dining Style</label>
-        <select
-          name="preferredDiningStyle"
-          value={formData.preferredDiningStyle}
-          onChange={handleChange}
-          style={styles.select}
-          required
-        >
-          <option value="">Select Preferred Dining Style</option>
-          <option value="casual">Casual</option>
-          <option value="fineDining">Fine Dining</option>
-          <option value="fastFood">Fast Food</option>
-          <option value="buffet">Buffet</option>
-          <option value="streetFood">Street Food</option>
-        </select>
+        <form onSubmit={handleSubmit}>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+          >
+            <TextField
+              label="Username"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+              variant="outlined"
+              required
+              InputProps={{
+                style: { color: '#333' },
+              }}
+              InputLabelProps={{
+                style: { color: '#333' },
+              }}
+              sx={{ marginBottom: '15px' }}
+            />
+          </motion.div>
 
-        <label style={styles.label}>Favorite Ingredients (comma-separated)</label>
-        <input
-          type="text"
-          name="favoriteIngredients"
-          placeholder="e.g., garlic, tomatoes, basil"
-          value={formData.favoriteIngredients}
-          onChange={handleChange}
-          style={styles.input}
-        />
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+          >
+            <TextField
+              label="Email"
+              name="email"
+              type="email"
+              value={formData.email}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+              variant="outlined"
+              required
+              InputProps={{
+                style: { color: '#333' },
+              }}
+              InputLabelProps={{
+                style: { color: '#333' },
+              }}
+              sx={{ marginBottom: '15px' }}
+            />
+          </motion.div>
 
-        <label style={styles.label}>Allergies (comma-separated)</label>
-        <input
-          type="text"
-          name="allergies"
-          placeholder="e.g., peanuts, shellfish, dairy"
-          value={formData.allergies}
-          onChange={handleChange}
-          style={styles.input}
-        />
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.7 }}
+          >
+            <TextField
+              label="Password"
+              name="password"
+              type="password"
+              value={formData.password}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+              variant="outlined"
+              required
+              InputProps={{
+                style: { color: '#333' },
+              }}
+              InputLabelProps={{
+                style: { color: '#333' },
+              }}
+              sx={{ marginBottom: '25px' }}
+            />
+          </motion.div>
 
-        <label style={styles.label}>Price Range</label>
-        <select
-          name="priceRange"
-          value={formData.priceRange}
-          onChange={handleChange}
-          style={styles.select}
-          required
-        >
-          <option value="">Select Price Range</option>
-          <option value="budget">Budget</option>
-          <option value="moderate">Moderate</option>
-          <option value="expensive">Expensive</option>
-          <option value="luxury">Luxury</option>
-        </select>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
+          >
+            <Button
+              type="submit"
+              variant="contained"
+              fullWidth
+              sx={{
+                mt: 2,
+                py: 1.5,
+                backgroundColor: '#4CAF50', // Classic green color for the button
+                color: 'white',
+                fontWeight: 'bold',
+                borderRadius: 3,
+                boxShadow: '0px 4px 20px rgba(0,0,0,0.2)',
+                '&:hover': {
+                  backgroundColor: '#45a049', // Darker green on hover
+                },
+              }}
+              component={motion.button}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              disabled={loading}
+            >
+              {loading ? 'Signing Up...' : 'Sign Up'}
+            </Button>
+          </motion.div>
 
-        <label style={styles.label}>Frequency of Dining Out</label>
-        <select
-          name="frequencyOfDiningOut"
-          value={formData.frequencyOfDiningOut}
-          onChange={handleChange}
-          style={styles.select}
-          required
-        >
-          <option value="">Select Frequency</option>
-          <option value="rarely">Rarely (less than once a month)</option>
-          <option value="occasionally">Occasionally (1-2 times a month)</option>
-          <option value="regularly">Regularly (1-2 times a week)</option>
-          <option value="frequently">Frequently (3+ times a week)</option>
-        </select>
-
-        <button type="submit" style={styles.button}>
-          Sign Up
-        </button>
-      </form>
-    </div>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1 }}
+            >
+              <Link
+                href="#"
+                underline="none"
+                sx={{ color: '#4CAF50', fontSize: '14px' }}
+              >
+                Forgot Password?
+              </Link>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.2 }}
+            >
+              <Link
+                href="/login" // Link to login page
+                underline="none"
+                sx={{ color: '#4CAF50', fontSize: '14px' }}
+              >
+                Already have an account? Login
+              </Link>
+            </motion.div>
+          </Box>
+        </form>
+      </Paper>
+    </Box>
   );
 };
 
-export default FoodieSignUpPage;
-
+export default SignUpPage;
