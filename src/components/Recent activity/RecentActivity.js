@@ -27,7 +27,7 @@ const RecentActivity = () => {
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const response = await fetch('https://ai.myedbox.com/api/api/recent', {
+        const response = await fetch('https://api.logsaga.com/api/recent', {
           method: 'POST',
         });
 
@@ -94,7 +94,7 @@ const RecentActivity = () => {
               <CardMedia
                 component="img"
                 height="200"
-                image={`https://ai.myedbox.com/api/api/${review.restaurant_image ? review.restaurant_image : ""}`}
+                image={`https://api.logsaga.com/api/${review.restaurant_image ? review.restaurant_image : ""}`}
                 alt={review.restaurant_name}
                 sx={{ objectFit: 'cover' }}
               />

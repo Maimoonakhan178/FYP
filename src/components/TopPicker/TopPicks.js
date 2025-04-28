@@ -19,23 +19,27 @@ const TopRestaurants = () => {
   useEffect(() => {
     const fetchRestaurants = async () => {
       try {
-        const response = await fetch('https://ai.myedbox.com/api/api/top-rated-restaurants', {
-          method: 'POST',
-        });
-
+        const response = await fetch(
+          "https://api.logsaga.com/api/top-rated-restaurants",
+          { method: "POST" }
+        );
         const data = await response.json();
-        if (response.ok) {
-          setRestaurants(data.restaurants || []);
+        if (!response.ok) {
+          // throw so your catch() gets it
+          throw new Error(data.error || data.detail || "Unknown error");
         }
-      } catch (error) {
-        console.error("Fetch error:", error);
+        setRestaurants(data.restaurants || []);
+      } catch (err) {
+        console.error("Fetch error:", err);
       } finally {
         setLoading(false);
       }
     };
-
+  
     fetchRestaurants();
   }, []);
+  
+  
 
   const RestaurantCard = ({ restaurant }) => {
     const cuisineTypes = JSON.parse(restaurant.cuisine_type);
@@ -56,7 +60,7 @@ const TopRestaurants = () => {
         <CardMedia
           component="img"
           height="200"
-          image={`https://ai.myedbox.com/api/api/${restaurant.restaurant_image ? restaurant.restaurant_image : ""}`}
+          image={`https://api.logsaga.com/api/${restaurant.restaurant_image ? restaurant.restaurant_image : ""}`}
           alt={restaurant.restaurant_name}
         />
         <CardContent>

@@ -45,7 +45,7 @@ const RestaurantCardSection = ({ searchQuery }) => {
         form.append('query', sanitizedSearchQuery); // Add query to form
 
         // Send the POST request
-        const response = await fetch('https://ai.myedbox.com/api/api/search', {
+        const response = await fetch('https://api.logsaga.com/api/search', {
           method: 'POST',
           body: form,
         });
@@ -78,7 +78,7 @@ const RestaurantCardSection = ({ searchQuery }) => {
           {filteredRestaurants.map((restaurant, index) => (
             <div key={index} className="card">
               <img
-              src={`https://ai.myedbox.com/api/api/${restaurant.image ? restaurant.image : bgImage}`}
+              src={`https://api.logsaga.com/api/${restaurant.image ? restaurant.image : bgImage}`}
               alt={restaurant.restaurant_name}
               className="cardImage"
               />
