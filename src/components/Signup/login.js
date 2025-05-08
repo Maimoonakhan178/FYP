@@ -1,55 +1,109 @@
-import React, { useState } from 'react';
-import Lottie from 'react-lottie';
-import { Box, Button, TextField, Typography, Paper } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
-import * as animationData from './Animation - 1735323792812.json'; // Lottie animation ka JSON file ka path
+import React, { useState } from "react";
+import Lottie from "react-lottie";
+import { Box, Button, TextField, Typography, Paper } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import * as animationData from "./Animation - 1735323792812.json";
 
-const LoginPage = ({ setLoggedIn }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState(null);
+export default function LoginPage({ onLogin }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setError("");
     if (!email || !password) {
-      setError('Please enter both email and password.');
+      setError("Please enter both email and password.");
       return;
     }
 
-    if (email !== 'user@example.com' || password !== 'password') {
-      setError('Invalid credentials, please try again.');
-      return;
-    }
+    setLoading(true);
+    try {
+      const form = new FormData();
+      form.append("email", email);
+      form.append("password", password);
 
-    setLoggedIn(true);
-    navigate('/food-selection'); // Redirect food selection page
+      const res = await fetch("http://127.0.0.1:5000/api/signin", {
+        method: "POST",
+        body: form,
+      });
+      const body = await res.json();
+      if (!res.ok) {
+        throw new Error(body.detail || "Login failed");
+      }
+
+      // body = { message, ip, name }
+      onLogin({ email, name: body.name, ip: body.ip });
+
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const lottieOptions = {
     loop: true,
-    autoplay: true, 
-    animationData: animationData, 
-    rendererSettings: {
-      preserveAspectRatio: 'xMidYMid slice',
-    },
+    autoplay: true,
+    animationData,
+    rendererSettings: { preserveAspectRatio: "xMidYMid slice" },
   };
 
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#f5f5f5' }}>
-      <Paper sx={{ padding: 3, maxWidth: 400, width: '100%', textAlign: 'center' }}>
-        <Lottie options={lottieOptions} height={150} width={150} />
-        <Typography variant="h4" sx={{ marginBottom: 2 }}>Login</Typography>
-        <form onSubmit={handleLogin}>
-          <TextField label="Email" type="email" fullWidth margin="normal" value={email} onChange={(e) => setEmail(e.target.value)} required />
-          <TextField label="Password" type="password" fullWidth margin="normal" value={password} onChange={(e) => setPassword(e.target.value)} required />
-          {error && <Typography color="error" sx={{ marginTop: 1 }}>{error}</Typography>}
-          <Button type="submit" variant="contained" fullWidth sx={{ marginTop: 2 }}>Login</Button>
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100vh",
+        backgroundColor: "#f5f5f5",
+      }}
+    >
+      <Paper sx={{ padding: 4, maxWidth: 400, width: "100%" }}>
+        <Lottie options={lottieOptions} height={120} width={120} />
+        <Typography variant="h5" align="center" gutterBottom>
+          Log In
+        </Typography>
+
+        <form onSubmit={handleSubmit}>
+          <TextField
+            label="Email"
+            type="email"
+            fullWidth
+            margin="normal"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <TextField
+            label="Password"
+            type="password"
+            fullWidth
+            margin="normal"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+
+          {error && (
+            <Typography color="error" sx={{ mt: 1 }}>
+              {error}
+            </Typography>
+          )}
+
+          <Button
+            type="submit"
+            variant="contained"
+            fullWidth
+            sx={{ mt: 2 }}
+            disabled={loading}
+          >
+            {loading ? "Signing in…" : "Sign In"}
+          </Button>
         </form>
       </Paper>
     </Box>
   );
-};
-
-export default LoginPage;
+}

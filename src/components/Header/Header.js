@@ -1,5 +1,6 @@
+// src/components/Header/Header.jsx
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   AppBar,
   Toolbar,
@@ -16,45 +17,69 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import Logo from "./Logo.png";
 
 const Header = () => {
+  const navigate = useNavigate();
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+  const [user, setUser] = useState(() => {
+    // lazy-init from localStorage
+    try {
+      return JSON.parse(localStorage.getItem("user"));
+    } catch {
+      return null;
+    }
+  });
   const [scrolled, setScrolled] = useState(false);
 
+  // listen for scroll to adjust transparency
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
-    };
+    const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Keep local `user` in sync if something else writes to localStorage
+  useEffect(() => {
+    const onStorage = (e) => {
+      if (e.key === "user") {
+        try {
+          setUser(JSON.parse(e.newValue));
+        } catch {
+          setUser(null);
+        }
+      }
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    setUser(null);
+    navigate("/login", { replace: true });
+  };
 
   return (
     <AppBar
       position="fixed"
       sx={{
-        top: "10px", // Moves it closer to the top
-        left: "50%",
-
-        transform: "translateX(-50%)", // Centers it horizontally
-        width: "85%", // Slightly smaller for a floating effect
-        background: scrolled
-          ? "rgba(255, 215, 0, 0.6)" // More transparency when scrolled
-          : "rgba(255, 215, 0, 0.75)", // Slightly transparent initially
-        backdropFilter: "blur(20px)", // Stronger blur effect
-        boxShadow: "0px 6px 20px rgba(0, 0, 0, 0.2)", // Floating effect
-        borderRadius: "14px", // More refined roundness
+        top: "10px", left: "50%",
+        transform: "translateX(-50%)",
+        width: "85%",
+        background: scrolled ? "rgba(255,215,0,0.6)" : "rgba(255,215,0,0.75)",
+        backdropFilter: "blur(20px)",
+        boxShadow: "0px 6px 20px rgba(0,0,0,0.2)",
+        borderRadius: "14px",
         transition: "0.3s ease-in-out",
         padding: "8px 0",
       }}
     >
       <Container maxWidth="lg">
         <Toolbar sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          {/* Left Side - Navigation */}
+          {/* Left nav */}
           <Box sx={{ display: { xs: "none", md: "flex" }, gap: 3 }}>
             {[
               { name: "Home", path: "/" },
               { name: "Restaurants", path: "/restaurant" },
-              { name: "Recommendation", path: "/recommendation" },
+              { name: "Dish", path: "/dish" },
               { name: "Contact", path: "/contact" },
             ].map((item) => (
               <Button
@@ -86,7 +111,7 @@ const Header = () => {
             }}
           />
 
-          {/* Right Side - Buttons */}
+          {/* Right side */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
             <Button
               variant="contained"
@@ -100,7 +125,6 @@ const Header = () => {
             >
               Get Location
             </Button>
-
             <Button
               variant="contained"
               sx={{
@@ -116,13 +140,12 @@ const Header = () => {
 
             {user ? (
               <Stack direction="row" spacing={1} alignItems="center">
-                <Avatar>{user.name[0]}</Avatar>
+                <Avatar sx={{ bgcolor: "#FF5722" }}>
+                  {user.name ? user.name.charAt(0).toUpperCase() : "U"}
+                </Avatar>
                 <Button
                   variant="outlined"
-                  onClick={() => {
-                    localStorage.removeItem("user");
-                    setUser(null);
-                  }}
+                  onClick={handleLogout}
                   sx={{
                     borderColor: "#000",
                     color: "#000",
@@ -150,11 +173,15 @@ const Header = () => {
             )}
           </Box>
 
-          {/* Mobile Drawer */}
-          <IconButton edge="start" color="inherit" onClick={() => setDrawerOpen(true)} sx={{ display: { md: "none" } }}>
+          {/* Mobile menu */}
+          <IconButton
+            edge="start"
+            color="inherit"
+            onClick={() => setDrawerOpen(true)}
+            sx={{ display: { md: "none" } }}
+          >
             <MenuIcon />
           </IconButton>
-
           <Drawer anchor="left" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
             <Box sx={{ width: 250, p: 2 }}>
               {[
@@ -163,10 +190,27 @@ const Header = () => {
                 { name: "Recommendation", path: "/recommendation" },
                 { name: "Contact", path: "/contact" },
               ].map((item) => (
-                <Button key={item.name} component={Link} to={item.path} sx={{ display: "block", textAlign: "left" }}>
+                <Button
+                  key={item.name}
+                  component={Link}
+                  to={item.path}
+                  sx={{ display: "block", textAlign: "left" }}
+                  onClick={() => setDrawerOpen(false)}
+                >
                   {item.name}
                 </Button>
               ))}
+              {user && (
+                <Button
+                  sx={{ display: "block", textAlign: "left", mt: 2 }}
+                  onClick={() => {
+                    setDrawerOpen(false);
+                    handleLogout();
+                  }}
+                >
+                  Log Out
+                </Button>
+              )}
             </Box>
           </Drawer>
         </Toolbar>

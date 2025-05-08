@@ -29,7 +29,7 @@ const NewsletterSubscribe = () => {
       const form = new FormData();
       form.append("email", email);
 
-      const response = await fetch("https://api.logsaga.com/api/newsletter", {
+      const response = await fetch("http://127.0.0.1:5000/api/newsletter", {
         method: "POST",
         body: form,
       });

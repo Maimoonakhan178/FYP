@@ -20,7 +20,7 @@ const TopRestaurants = () => {
     const fetchRestaurants = async () => {
       try {
         const response = await fetch(
-          "https://api.logsaga.com/api/top-rated-restaurants",
+          "http://127.0.0.1:5000/api/top-rated-restaurants",
           { method: "POST" }
         );
         const data = await response.json();
@@ -60,7 +60,7 @@ const TopRestaurants = () => {
         <CardMedia
           component="img"
           height="200"
-          image={`https://api.logsaga.com/api/${restaurant.restaurant_image ? restaurant.restaurant_image : ""}`}
+          image={`http://127.0.0.1:5000/api/${restaurant.restaurant_image ? restaurant.restaurant_image : ""}`}
           alt={restaurant.restaurant_name}
         />
         <CardContent>

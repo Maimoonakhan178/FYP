@@ -1,103 +1,84 @@
 import React, { useState, useEffect } from "react";
 import "./RestaurantCardSection.css";
-import bgImage from "./bg.jpg"; 
-// import bgImage1 from "./karachi-grill-restaurant.jpg"; 
-// import bgImage2 from "./foodie.jpg"; 
-// import bgImage3 from "./taste.jpeg"; 
-// import bgImage4 from "./bk.jpg"; 
-// import bgImage5 from "./delight.jpg"; 
-//import CardActions from '@mui/material/CardActions';
-// or
-// import { CardActions } from '@mui/material';
+import placeholder from "./placeholder.jpg"; // ← your square JPG/NG file
 
-// Mock data for restaurants
-// const restaurantData = {
-//   biryani: [
-//     { name: "Biryani House", description: "Delicious and spicy biryani.", image: bgImage },
-//     { name: "Biryani King", description: "Authentic Hyderabadi biryani.", image: bgImage },
-//   ],
-//   burger: [
-//     { name: "Burger King", description: "Juicy burgers with crispy fries.", image: bgImage4 },
-//     { name: "Burger Delight", description: "Best burgers in town.", image: bgImage5 },
-//   ],
-//   topRestaurants: [
-//     { name: "Karachi Grill", description: "Top-rated steakhouse in Karachi.", image: bgImage1 },
-//     { name: "The Foodie", description: "A top choice for food lovers.", image: bgImage2 },
-//     { name: "Taste of Karachi", description: "Best of Pakistani cuisine.", image: bgImage3 },
-//   ],
-// };
+export default function RestaurantCardSection({ searchQuery }) {
+  const stored   = localStorage.getItem("user");
+  const user     = stored ? JSON.parse(stored) : {};
+  const location = user.location || "your area";
 
-
-
-const RestaurantCardSection = ({ searchQuery }) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  const [filteredRestaurants, setFilteredRestaurants] = useState([]);
+  const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const fetchData = async () => {
-      let sanitizedSearchQuery = searchQuery?.toLowerCase() || "";
-      let filtered = [];
-      sanitizedSearchQuery+=" at location of "+ user.location;
-      console.log(sanitizedSearchQuery);
-      try {
-        // Create a new FormData object
-        const form = new FormData();
-        form.append('query', sanitizedSearchQuery); // Add query to form
-
-        // Send the POST request
-        const response = await fetch('https://api.logsaga.com/api/search', {
-          method: 'POST',
-          body: form,
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-          filtered = data.results;
-          console.log(filtered);
-        } else {
-          console.log(data.message || 'Search failed. Please try again.');
-        }
-      } catch (err) {
-        console.log('An error occurred while searching. Please try again.');
-      }
-
-      // Update the state
-      setFilteredRestaurants(filtered);
-    };
-
-    if (searchQuery) {
-      fetchData();
+    if (!searchQuery) {
+      setResults([]);
+      return;
     }
-  }, [searchQuery,user.location]); // Dependency array includes `searchQuery`
+    setLoading(true);
+
+    const q = `${searchQuery.toLowerCase()} at ${location}`;
+    const form = new FormData();
+    form.append("query", q);
+
+    fetch("http://127.0.0.1:5000/api/search", {
+      method: "POST",
+      body: form,
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setResults(Array.isArray(data.results) ? data.results : []);
+      })
+      .catch(() => setResults([]))
+      .finally(() => setLoading(false));
+  }, [searchQuery, location]);
+
+  if (loading) {
+    return <div className="rc-loading">Loading recommendations…</div>;
+  }
+  if (!results.length) {
+    return null;
+  }
 
   return (
-    <div className="restaurantSection">
-      {filteredRestaurants.length > 0 && (
-        <div className="cardContainer">
-          {filteredRestaurants.map((restaurant, index) => (
-            <div key={index} className="card">
-              <img
-              src={`https://api.logsaga.com/api/${restaurant.image ? restaurant.image : bgImage}`}
-              alt={restaurant.restaurant_name}
-              className="cardImage"
-              />
+    <section className="restaurantSection">
+      <h2 className="sectionTitle">Recommended for you</h2>
+      <div className="cardGrid">
+        {results.map((r, i) => {
+          // parse coords safely
+          const lat = parseFloat(r.location_latitude);
+          const lon = parseFloat(r.location_longitude);
+          const latText = !isNaN(lat) ? lat.toFixed(4) : r.location_latitude;
+          const lonText = !isNaN(lon) ? lon.toFixed(4) : r.location_longitude;
 
-              <div className="cardContent">
-                <h3>{restaurant.restaurant_name +" " +restaurant.location_name + " (" + restaurant.popularity_score  + ")"}
+          return (
+            <div key={i} className="card">
+              <div
+                className="cardImage"
+                style={{
+                  backgroundImage: `url(${
+                    r.image
+                      ? `http://127.0.0.1:5000/${r.image}`
+                      : placeholder
+                  })`,
+                }}
+              />
+              <div className="cardBody">
+                <h3 className="cardTitle">
+                  {r.restaurant_name} — {r.location_name}
                 </h3>
-                <p>{restaurant.dish_name}</p>
+                <p className="cardSubtitle">
+                  <strong>Dish:</strong> {r.dish_name}
+                </p>
+                <p className="cardMeta">
+                  <strong>Price:</strong>{" "}
+                  {Number(r.price).toLocaleString()} PKR
+                </p>
               </div>
             </div>
-          ))}
-        </div>
-      )}
-      {/* {filteredRestaurants.length === 0 && searchQuery && (
-        <p>No restaurants found for "{searchQuery}"</p>
-      )} */}
-    </div>
+          );
+        })}
+      </div>
+    </section>
   );
-};
-
-export default RestaurantCardSection;
-
+}
