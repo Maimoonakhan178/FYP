@@ -27,6 +27,14 @@ const Header = () => {
       return null;
     }
   });
+   const [userEmail, setUserEmail] = useState(() => {
+    // lazy-init from localStorage
+    try {
+      return localStorage.getItem("userEmail");
+    } catch {
+      return null;
+    }
+  });
   const [scrolled, setScrolled] = useState(false);
 
   // listen for scroll to adjust transparency
@@ -52,9 +60,11 @@ const Header = () => {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
+    localStorage.removeItem("userEmail");
     setUser(null);
-    navigate("/login", { replace: true });
+   setTimeout(() => {
+    window.location.reload();
+    }, 1000);
   };
 
   return (
@@ -72,7 +82,8 @@ const Header = () => {
         padding: "8px 0",
       }}
     >
-      <Container maxWidth="lg">
+      {/* i need x large */}
+      <Container maxWidth="xl">
         <Toolbar sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           {/* Left nav */}
           <Box sx={{ display: { xs: "none", md: "flex" }, gap: 3 }}>
@@ -81,6 +92,8 @@ const Header = () => {
               { name: "Restaurants", path: "/restaurant" },
               { name: "Dish", path: "/dish" },
               { name: "Contact", path: "/contact" },
+              { name: "Restaurant Recommendation", path: "/restaurant-recommendation" },
+              { name: "Dish Recommendation", path: "/dish-recommendation" },
             ].map((item) => (
               <Button
                 key={item.name}
@@ -138,14 +151,14 @@ const Header = () => {
               Write a Review
             </Button>
 
-            {user ? (
+            {userEmail ? (
               <Stack direction="row" spacing={1} alignItems="center">
                 <Avatar sx={{ bgcolor: "#FF5722" }}>
-                  {user.name ? user.name.charAt(0).toUpperCase() : "U"}
+                  {userEmail ? userEmail.charAt(0).toUpperCase() : "U"}
                 </Avatar>
                 <Button
                   variant="outlined"
-                  onClick={handleLogout}
+                  onClick={() => handleLogout()}
                   sx={{
                     borderColor: "#000",
                     color: "#000",
@@ -200,7 +213,7 @@ const Header = () => {
                   {item.name}
                 </Button>
               ))}
-              {user && (
+              {userEmail && (
                 <Button
                   sx={{ display: "block", textAlign: "left", mt: 2 }}
                   onClick={() => {

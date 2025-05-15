@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
+const IMG_BASE = 'https://c602-2400-adc1-4a9-a00-47a-8f89-7a8c-c33c.ngrok-free.app/media/dish';
+const FALLBACK = 'https://via.placeholder.com/…';
+
 const Dish = () => {
   // Filter state
   const [searchQuery, setSearchQuery] = useState('');
@@ -33,7 +36,7 @@ const Dish = () => {
     selectedRatings.forEach(r => formData.append('ratings', r));
     formData.append('sort_by', sortOption);
 
-    fetch('http://127.0.0.1:5000/api/dishes/search', {
+    fetch('https://c602-2400-adc1-4a9-a00-47a-8f89-7a8c-c33c.ngrok-free.app/api/dishes/search', {
       method: 'POST',
       body: formData,
     })
@@ -632,7 +635,7 @@ const Dish = () => {
               ) : (
                 dishes.map(dish => {
                   const isHovered = hoveredDishId === dish.dish_id;
-                  
+                  const imgUrl = dish.image || `${IMG_BASE}/${dish.dish_id}.jpg`;
                   return (
                     <div 
                       key={dish.dish_id} 
@@ -645,15 +648,11 @@ const Dish = () => {
                     >
                       <div style={styles.dishImageContainer}>
                         <img 
-                          src={dish.image || dish.img || getPlaceholderImage(dish.dish_id)}
+                          src={imgUrl}
                           alt={dish.dish_name}
                           style={{
                             ...styles.dishImage,
                             ...(isHovered ? styles.dishImageHovered : {})
-                          }}
-                          onError={(e) => {
-                            e.target.src = getPlaceholderImage(dish.dish_id);
-                            e.target.onerror = null;
                           }}
                         />
                         <div style={styles.priceTag}>

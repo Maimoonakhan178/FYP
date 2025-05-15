@@ -1,309 +1,223 @@
 import React, { useState, useEffect } from "react";
-import { Star, Clock, MapPin, DollarSign } from "lucide-react";
-import "./RestaurantFinder.css"; // We'll create this CSS file separately
+import {
+  Star,
+  MapPin,
+  Smile,
+  ThumbsUp,
+  AlertCircle,
+  DollarSign,
+} from "lucide-react";
+import "./RestaurantFinder.css";
 
-// Card component for each restaurant
-const RestaurantCard = ({ restaurant }) => {
-  const navigate = (url) => {
-    window.location.href = url;
-  };
-
-  // Function to render price level with dollar signs
-  const renderPriceLevel = (level) => {
-    switch(level) {
-      case "Budget": return <span><DollarSign size={14} /></span>;
-      case "Mid-range": return <span><DollarSign size={14} /><DollarSign size={14} /></span>;
-      case "Expensive": return <span><DollarSign size={14} /><DollarSign size={14} /><DollarSign size={14} /></span>;
-      default: return <span><DollarSign size={14} /></span>;
-    }
-  };
-
-  // Function to create star rating
-  const renderStars = (rating) => {
-    const stars = [];
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 >= 0.5;
-    
-    // Add full stars
-    for (let i = 0; i < fullStars; i++) {
-      stars.push(<Star key={`full-${i}`} className="star filled" size={16} />);
-    }
-    
-    // Add half star if needed
-    if (hasHalfStar) {
-      stars.push(<Star key="half" className="star half-filled" size={16} />);
-    }
-    
-    // Add empty stars
-    const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-    for (let i = 0; i < emptyStars; i++) {
-      stars.push(<Star key={`empty-${i}`} className="star empty" size={16} />);
-    }
-    
-    return stars;
-  };
-
-  return (
-    <div 
-      className="restaurant-card" 
-      onClick={() => navigate(`http://127.0.0.1:5000/api/restaurant/${encodeURIComponent(restaurant.name)}`)}
-    >
-      <div 
-        className="card-image" 
-        style={{ backgroundImage: `url(${restaurant.image || "/placeholder.jpg"})` }}
-      >
-        {restaurant.isPromoted && <span className="promoted-badge">Featured</span>}
-      </div>
-      <div className="card-content">
-        <h3 className="restaurant-name">{restaurant.name}</h3>
-        
-        <div className="rating-container">
-          <div className="star-rating">
-            {renderStars(restaurant.average_rating)}
-          </div>
-          <span className="rating-text">
-            {restaurant.average_rating.toFixed(1)} ({restaurant.reviews_count || 0})
-          </span>
-        </div>
-        
-        <div className="restaurant-details">
-          <div className="detail-item">
-            <MapPin size={14} className="detail-icon" />
-            <span>{restaurant.location_name}</span>
-          </div>
-          
-          <div className="detail-item price-level">
-            {renderPriceLevel(restaurant.priceCategory)}
-          </div>
-          
-          {restaurant.isOpenNow && (
-            <div className="detail-item open-now">
-              <Clock size={14} className="detail-icon" />
-              <span>Open Now</span>
-            </div>
-          )}
-        </div>
-        
-        <div className="cuisine-tags">
-          {restaurant.cuisine_type.map((cuisine, idx) => (
-            <span key={idx} className="cuisine-tag">{cuisine}</span>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// Main Restaurants page
 export default function RestaurantFinder() {
-  // server data
   const [restaurants, setRestaurants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // client-side filters
-  const [activeFilters, setActiveFilters] = useState(["All"]);
-  const filters = ["All", "Open Now", "Top Rated", "Delivery", "Outdoor Seating"];
-
-  // backend filters
-  const [minRating, setMinRating] = useState(0.0);
+  const [minRating, setMinRating] = useState(0);
   const [cuisine, setCuisine] = useState("");
   const [sortOrder, setSortOrder] = useState("rating");
 
-  // fetch on mount or when backend filters change
+  const cuisineOptions = [
+    "Italian",
+    "Mexican",
+    "Japanese",
+    "American",
+    "Indian",
+  ];
+  const IMG_BASE =
+    "https://c602-2400-adc1-4a9-a00-47a-8f89-7a8c-c33c.ngrok-free.app/media/res";
+
   useEffect(() => {
     setLoading(true);
     setError(null);
 
     const qs = new URLSearchParams();
-    if (minRating) qs.set("minRating", minRating.toString());
+    if (minRating) qs.set("minRating", minRating);
     if (cuisine) qs.set("cuisine", cuisine);
-    if (sortOrder) qs.set("sort", sortOrder);
 
-    fetch(`http://127.0.0.1:5000/api/restaurants?${qs.toString()}`, { credentials: "include" })
+    fetch(
+      `https://c602-2400-adc1-4a9-a00-47a-8f89-7a8c-c33c.ngrok-free.app/api/restaurants?${qs}`,
+      { credentials: "include" }
+    )
       .then(async (res) => {
-        if (!res.ok) {
-          const text = await res.text().catch(() => "");
-          throw new Error(`HTTP ${res.status}: ${text || res.statusText}`);
-        }
-        const contentType = res.headers.get("content-type") || "";
-        if (contentType.includes("application/json")) {
-          return res.json();
-        } else {
-          const body = await res.text();
-          throw new Error(`Expected JSON but got ${contentType} - ${body.substring(0,200)}...`);
-        }
+        if (!res.ok) throw new Error(await res.text());
+        return res.json();
       })
       .then((data) => {
-        // Process the data to add isOpenNow flag
-        const now = new Date();
-        const currentHour = now.getHours();
-        const currentMinutes = now.getMinutes();
-        const currentTime = currentHour * 60 + currentMinutes;
-        
-        const processedData = data.map(restaurant => {
-          // Assuming restaurant has openTime and closeTime in "HH:MM" format
-          let isOpenNow = false;
-          
-          if (restaurant.openTime && restaurant.closeTime) {
-            const [openHour, openMin] = restaurant.openTime.split(':').map(Number);
-            const [closeHour, closeMin] = restaurant.closeTime.split(':').map(Number);
-            
-            const openTimeMinutes = openHour * 60 + openMin;
-            const closeTimeMinutes = closeHour * 60 + closeMin;
-            
-            isOpenNow = currentTime >= openTimeMinutes && currentTime <= closeTimeMinutes;
-          }
-          
-          return {
-            ...restaurant,
-            isOpenNow
-          };
-        });
-        
-        setRestaurants(processedData);
+        const normalized = data.map((r) => ({
+          ...r,
+          average_rating: parseFloat(r.average_rating) || null,
+          avg_food_quality: parseFloat(r.avg_food_quality) || null,
+          avg_service: parseFloat(r.avg_service) || null,
+          avg_ambiance: parseFloat(r.avg_ambiance) || null,
+          avg_sentiment: parseFloat(r.avg_sentiment) || null,
+          popularity: parseFloat(r.popularity) || null,
+        }));
+
+        const sorted =
+          sortOrder === "popularity"
+            ? normalized.sort(
+                (a, b) => (b.popularity || 0) - (a.popularity || 0)
+              )
+            : normalized;
+
+        setRestaurants(sorted);
       })
-      .catch((err) => {
-        console.error("Fetch /api/restaurants failed:", err);
-        setError(err.message || "Failed to load restaurants");
-      })
+      .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, [minRating, cuisine, sortOrder]);
 
-  // toggle client-side filters
-  const toggleFilter = (filter) => {
-    if (filter === "All") return setActiveFilters(["All"]);
-    setActiveFilters((prev) => {
-      const next = prev.includes(filter)
-        ? prev.filter((f) => f !== filter)
-        : [...prev.filter((f) => f !== "All"), filter];
-      return next.length ? next : ["All"];
-    });
-  };
-
-  // apply client-side filtering
-  const filteredRestaurants = restaurants.filter((r) => {
-    if (activeFilters.includes("All")) return true;
-    
-    return activeFilters.every((filter) => {
-      switch(filter) {
-        case "Open Now": 
-          return r.isOpenNow;
-        case "Top Rated": 
-          return r.average_rating >= 4.0;
-        case "Delivery": 
-          return r.hasDelivery;
-        case "Outdoor Seating": 
-          return r.hasOutdoorSeating;
-        default: 
-          return true;
-      }
-    });
-  });
+  if (loading)
+    return (
+      <div className="rf-loading">
+        <div className="rf-spinner" />
+        <p>Loading restaurants...</p>
+      </div>
+    );
+  if (error)
+    return (
+      <div className="rf-error">
+        <AlertCircle size={32} />
+        <h3>Something went wrong</h3>
+        <p>{error}</p>
+      </div>
+    );
 
   return (
-    <div className="restaurant-finder">
-      <div className="header">
-        <h1>Discover Karachi's Finest Dining</h1>
-        <p>Find and explore the best restaurants tailored to your taste</p>
-      </div>
+    <div className="rf-container">
+      <header className="rf-header">
+        <h1>Find Your Next Favorite Restaurant</h1>
+        <p>Discover the best dining experiences in your area</p>
+      </header>
 
-      <div className="filters-section">
-        <div className="search-options">
-          <div className="rating-filter">
-            <label htmlFor="min-rating">Min Rating:</label>
-            <input
-              id="min-rating"
-              type="range"
-              min="0"
-              max="5"
-              step="0.5"
-              value={minRating}
-              onChange={(e) => setMinRating(parseFloat(e.target.value))}
-            />
-            <span className="rating-value">{minRating.toFixed(1)}</span>
-          </div>
-          
-          <div className="cuisine-filter">
-            <input
-              type="text"
-              value={cuisine}
-              onChange={(e) => setCuisine(e.target.value)}
-              placeholder="Search by cuisine..."
-              className="cuisine-input"
-            />
-          </div>
-          
-          <div className="sort-filter">
-            <select 
-              value={sortOrder} 
-              onChange={(e) => setSortOrder(e.target.value)}
-              className="sort-select"
-            >
-              <option value="rating">Sort by Rating</option>
-              <option value="reviews">Sort by Most Reviewed</option>
-              <option value="newest">Sort by Newest</option>
-            </select>
+      <section className="rf-filters">
+        <div className="rf-filter-item">
+          <label htmlFor="cuisine-select">Cuisine</label>
+          <select
+            id="cuisine-select"
+            value={cuisine}
+            onChange={(e) => setCuisine(e.target.value)}
+          >
+            <option value="">All Cuisines</option>
+            {cuisineOptions.map((opt) => (
+              <option key={opt} value={opt}>
+                {opt}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="rf-filter-item">
+          <span className="rf-filter-label">Min Rating:</span>
+          <div className="rf-rating-buttons">
+            {[0, 3, 3.5, 4, 4.5].map((r) => (
+              <button
+                key={r}
+                className={`rf-button ${
+                  minRating === r ? "rf-button-active" : ""
+                }`}
+                onClick={() => setMinRating(r)}
+              >
+                {r === 0 ? "All" : `${r}+`}
+              </button>
+            ))}
           </div>
         </div>
-        
-        <div className="filter-tags">
-          {filters.map((filter) => (
-            <button
-              key={filter}
-              className={`filter-tag ${activeFilters.includes(filter) ? 'active' : ''}`}
-              onClick={() => toggleFilter(filter)}
-            >
-              {filter}
-            </button>
-          ))}
-        </div>
-      </div>
 
-      {/* Loading state */}
-      {loading && (
-        <div className="loading-container">
-          <div className="loader"></div>
-          <p>Discovering restaurants...</p>
-        </div>
-      )}
-
-      {/* Error state */}
-      {!loading && error && (
-        <div className="error-container">
-          <p className="error-message">{error}</p>
-          <button className="retry-button" onClick={() => window.location.reload()}>
-            Try Again
-          </button>
-        </div>
-      )}
-
-      {/* Results */}
-      {!loading && !error && (
-        <>
-          <div className="results-info">
-            <p>Found {filteredRestaurants.length} restaurants</p>
+        <div className="rf-filter-item">
+          <span className="rf-filter-label">Sort by:</span>
+          <div className="rf-sort-buttons">
+            {[
+              { value: "rating", label: "Rating" },
+              { value: "popularity", label: "Popularity" },
+            ].map((opt) => (
+              <button
+                key={opt.value}
+                className={`rf-button ${
+                  sortOrder === opt.value ? "rf-button-active" : ""
+                }`}
+                onClick={() => setSortOrder(opt.value)}
+              >
+                {opt.label}
+              </button>
+            ))}
           </div>
-          
-          <div className="restaurants-grid">
-            {filteredRestaurants.length > 0 ? (
-              filteredRestaurants.map((restaurant) => (
-                <RestaurantCard key={restaurant.restaurant_id} restaurant={restaurant} />
-              ))
-            ) : (
-              <div className="no-results">
-                <p>No restaurants match your filters</p>
-                <button className="reset-button" onClick={() => {
-                  setActiveFilters(["All"]);
-                  setMinRating(0);
-                  setCuisine("");
-                }}>
-                  Reset Filters
-                </button>
+        </div>
+      </section>
+
+      <section className="rf-restaurant-grid">
+        {restaurants.map((rest) => (
+          <article key={rest.restaurant_id} className="rf-card">
+            <div className="rf-card-image">
+              <img
+                src={`${IMG_BASE}/${rest.restaurant_id}.jpg`}
+                alt={rest.name}
+                className="rf-card-img"
+                onError={(e) => (e.currentTarget.src = "/fallback.jpg")}
+              />
+            </div>
+            <div className="rf-card-content">
+              <div className="rf-card-header">
+                <h2>{rest.name}</h2>
+                <div className="rf-rating">
+                  <Star size={16} />
+                  <span>{rest.average_rating?.toFixed(1) ?? "-"}</span>
+                </div>
               </div>
-            )}
-          </div>
-        </>
+              <div className="rf-card-meta">
+                <div>
+                  <MapPin size={16} />
+                  <span>{rest.location_name}</span>
+                </div>
+                <div>{rest.cuisine_type.join(", ")}</div>
+              </div>
+              <div className="rf-scores">
+                {[
+                  ["Food", rest.avg_food_quality],
+                  ["Service", rest.avg_service],
+                  ["Ambiance", rest.avg_ambiance],
+                  ["Sentiment", rest.avg_sentiment],
+                ].map(([label, val]) => (
+                  <div key={label} className="rf-score">
+                    <ThumbsUp size={16} />
+                    <span>{label}</span>
+                    <div className="rf-score-value">
+                      {val?.toFixed(1) ?? "-"}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {/* Aspect Analytics */}
+              {rest.aspect_analytics?.length > 0 && (
+                <div className="rf-aspect-analytics">
+                  {rest.aspect_analytics.map((a) => (
+                    <div key={a.aspectType} className="rf-aspect-item">
+                      <strong>{a.aspectType}</strong>
+                      <div className="rf-aspect-score">
+                        Sentiment: {a.avgSentimentScore.toFixed(1)}
+                      </div>
+                      <div className="rf-aspect-counts">
+                        <span>Total Reviews: {a.averageCount}</span>
+                        <span>Below Avg: {a.belowAverageCount}</span>
+                        <span>Excellent: {a.brilliantCount}</span>
+                        <span>Good: {a.goodCount}</span>
+                        <span>Not Recommended: {a.notRecommendedCount}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </article>
+        ))}
+      </section>
+
+      {!restaurants.length && (
+        <div className="rf-no-results">
+          <h3>No restaurants found</h3>
+          <p>Try adjusting your filters to see more results</p>
+        </div>
       )}
     </div>
   );

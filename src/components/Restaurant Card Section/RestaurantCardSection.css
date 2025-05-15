@@ -34,12 +34,25 @@
   box-shadow: 0 8px 16px rgba(0,0,0,0.12);
 }
 
+/* Replace your old background‐image approach with an <img> inside .cardImage */
 .cardImage {
-  width: 100%;
+  /* keep your fixed height, crop overflow */
   height: 160px;
-  background-size: cover;
-  background-position: center;
+  overflow: hidden;
+  position: relative;
 }
+
+/* Make the img fill and cover the container */
+.cardImage img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
 
 .cardBody {
   padding: 16px;

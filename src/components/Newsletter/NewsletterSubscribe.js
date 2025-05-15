@@ -29,7 +29,7 @@ const NewsletterSubscribe = () => {
       const form = new FormData();
       form.append("email", email);
 
-      const response = await fetch("http://127.0.0.1:5000/api/newsletter", {
+      const response = await fetch("https://c602-2400-adc1-4a9-a00-47a-8f89-7a8c-c33c.ngrok-free.app/api/newsletter", {
         method: "POST",
         body: form,
       });

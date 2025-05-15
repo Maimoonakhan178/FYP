@@ -29,7 +29,7 @@ export default function RestaurantBrandSelection() {
 
   useEffect(() => {
     setLoading(true);
-    fetch("http://127.0.0.1:5000/interactive/restaurant-brands")
+    fetch("https://c602-2400-adc1-4a9-a00-47a-8f89-7a8c-c33c.ngrok-free.app/interactive/restaurant-brands")
       .then((r) => r.json())
       .then((data) => setBrands(data))
       .catch((error) => {

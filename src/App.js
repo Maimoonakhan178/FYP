@@ -33,28 +33,23 @@ import FoodSelectionPage from "./components/Signup/FoodSelectionPage";
 import Restaurants from "./components/Restaurant/restaurant";
 import Dish from "./components/Dish/Dish";
 import Contact from "./components/Contact/Contact";
+import RestaurantRecommendation from "./components/Recommendation/RestaurantRecommendation";
+import DishRecommendation from "./components/Recommendation/DishRecommendation";
 
 function App() {
-  const [user, setUser] = useState(null);
+  const [userEmail, setUserEmail] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [hasSearched, setHasSearched] = useState(false);
 
   // Load user from localStorage on mount
   useEffect(() => {
-    const raw = localStorage.getItem("user");
+    const raw = localStorage.getItem("userEmail");
     if (raw) {
       try {
-        setUser(JSON.parse(raw));
+        setUserEmail(raw);
       } catch {}
     }
   }, []);
-
-  // Sync state + localStorage
-  const saveUser = (u) => {
-    if (u) localStorage.setItem("user", JSON.stringify(u));
-    else localStorage.removeItem("user");
-    setUser(u);
-  };
 
   const handleSearch = (q) => {
     setSearchQuery(q);
@@ -64,8 +59,8 @@ function App() {
   return (
     <Router>
       <MainRoutes
-        user={user}
-        saveUser={saveUser}
+        userEmail={userEmail}
+        saveUser={null}
         searchQuery={searchQuery}
         hasSearched={hasSearched}
         onSearch={handleSearch}
@@ -74,13 +69,7 @@ function App() {
   );
 }
 
-function MainRoutes({
-  user,
-  saveUser,
-  searchQuery,
-  hasSearched,
-  onSearch,
-}) {
+function MainRoutes({ userEmail, saveUser, searchQuery, hasSearched, onSearch }) {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -92,19 +81,19 @@ function MainRoutes({
   ].includes(path);
   const isAuth = ["/signup", "/login"].includes(path);
 
-  // if not logged in and not on auth, send to login
-  if (!user && !isAuth) {
-    return <Navigate to="/login" replace />;
-  }
+  const RequireAuth = ({ userEmail, children }) => {
+    if (!userEmail) {
+      return <Navigate to="/login" replace />;
+    }
+    return children;
+  };
 
-  // If fully onboarded, block wizard & auth
-  if (user?.onboarded && (isWizard || isAuth)) {
-    return <Navigate to="/" replace />;
-  }
-  // If signed up but not finished wizard, block home & other non-wizard
-  if (user && !user.onboarded && !isWizard) {
-    return <Navigate to="/select-restaurants" replace />;
-  }
+  const RedirectIfAuthenticated = ({ userEmail, children }) => {
+    if (userEmail) {
+      return <Navigate to="/" replace />;
+    }
+    return children;
+  };
 
   const hideChrome = isWizard || isAuth;
 
@@ -112,9 +101,7 @@ function MainRoutes({
     <>
       {!hideChrome && (
         <Header
-          user={user}
           onLogout={() => {
-            saveUser(null);
             navigate("/login", { replace: true });
           }}
         />
@@ -125,17 +112,19 @@ function MainRoutes({
         <Route
           path="/"
           element={
-            <>
-              <HeroSection onSearch={onSearch} />
-              {hasSearched && (
-                <RestaurantCardSection searchQuery={searchQuery} />
-              )}
-              <RecentActivity />
-              <TopPicks />
-              <NewsletterSubscribe />
-              <ChatbotComponent />
-              <Footer />
-            </>
+            <RequireAuth userEmail={userEmail}>
+              <>
+                <HeroSection onSearch={onSearch} />
+                {hasSearched && (
+                  <RestaurantCardSection searchQuery={searchQuery} />
+                )}
+                <RecentActivity />
+                <TopPicks />
+                <NewsletterSubscribe />
+                <ChatbotComponent />
+                <Footer />
+              </>
+            </RequireAuth>
           }
         />
 
@@ -161,6 +150,25 @@ function MainRoutes({
           }
         />
 
+        <Route
+          path="/restaurant-recommendation"
+          element={
+            <>
+              <RestaurantRecommendation />
+              <Footer />
+            </>
+          }
+        />
+        <Route
+          path="/dish-recommendation"
+          element={
+            <>
+              <DishRecommendation />
+              <Footer />
+            </>
+          }
+        />
+
         {/* CONTACT PAGE */}
         <Route
           path="/contact"
@@ -176,25 +184,26 @@ function MainRoutes({
         <Route
           path="/signup"
           element={
-            <SignUpPage
-              onSuccess={({ email }) => {
-                saveUser({ email, onboarded: false });
-                navigate("/select-restaurants", { replace: true });
-              }}
-            />
+            <RedirectIfAuthenticated userEmail={userEmail}>
+              <SignUpPage
+                onSuccess={({ email }) => {
+                  navigate("/select-restaurants", { replace: true });
+                }}
+              />
+            </RedirectIfAuthenticated>
           }
         />
 
-        {/* LOGIN */}
         <Route
           path="/login"
           element={
-            <LoginPage
-              onLogin={({ email, name, ip }) => {
-                saveUser({ email, name, ip, onboarded: true });
-                navigate("/", { replace: true });
-              }}
-            />
+            <RedirectIfAuthenticated userEmail={userEmail}>
+              <LoginPage
+                onLogin={({ email, name, ip }) => {
+                  navigate("/", { replace: true });
+                }}
+              />
+            </RedirectIfAuthenticated>
           }
         />
 
@@ -216,17 +225,10 @@ function MainRoutes({
           element={
             <FoodSelectionPage
               onComplete={() => {
-                saveUser({ ...user, onboarded: true });
                 navigate("/", { replace: true });
               }}
             />
           }
-        />
-
-        {/* CATCH-ALL */}
-        <Route
-          path="*"
-          element={<Navigate to={user ? "/" : "/login"} replace />}
         />
       </Routes>
     </>

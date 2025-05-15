@@ -58,7 +58,7 @@ export default function FoodSelectionPage() {
 
     setLoading(true);
 
-    fetch('http://127.0.0.1:5000/interactive/restaurants/like', {
+    fetch('https://c602-2400-adc1-4a9-a00-47a-8f89-7a8c-c33c.ngrok-free.app/interactive/restaurants/like', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, branch_ids })
@@ -167,7 +167,7 @@ export default function FoodSelectionPage() {
 
     setSubmitting(true);
 
-    fetch('http://127.0.0.1:5000/interactive/dishes/like', {
+    fetch('https://c602-2400-adc1-4a9-a00-47a-8f89-7a8c-c33c.ngrok-free.app/interactive/dishes/like', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, dish_ids: selectedIds })

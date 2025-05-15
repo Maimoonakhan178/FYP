@@ -25,7 +25,7 @@ export default function LoginPage({ onLogin }) {
       form.append("email", email);
       form.append("password", password);
 
-      const res = await fetch("http://127.0.0.1:5000/api/signin", {
+      const res = await fetch("https://c602-2400-adc1-4a9-a00-47a-8f89-7a8c-c33c.ngrok-free.app/api/signin", {
         method: "POST",
         body: form,
       });
@@ -35,7 +35,12 @@ export default function LoginPage({ onLogin }) {
       }
 
       // body = { message, ip, name }
-      onLogin({ email, name: body.name, ip: body.ip });
+      // onLogin({ email, name: body.name, ip: body.ip });
+      localStorage.setItem('userEmail', email);
+    setTimeout(() => {
+    window.location.reload();
+    }, 1000);
+
 
     } catch (err) {
       setError(err.message);

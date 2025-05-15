@@ -20,7 +20,7 @@ const TopRestaurants = () => {
     const fetchRestaurants = async () => {
       try {
         const response = await fetch(
-          "http://127.0.0.1:5000/api/top-rated-restaurants",
+          "https://c602-2400-adc1-4a9-a00-47a-8f89-7a8c-c33c.ngrok-free.app/api/top-rated-restaurants",
           { method: "POST" }
         );
         const data = await response.json();
@@ -60,7 +60,7 @@ const TopRestaurants = () => {
         <CardMedia
           component="img"
           height="200"
-          image={`http://127.0.0.1:5000/api/${restaurant.restaurant_image ? restaurant.restaurant_image : ""}`}
+          image={`https://c602-2400-adc1-4a9-a00-47a-8f89-7a8c-c33c.ngrok-free.app/media/res/${restaurant.restaurant_id? restaurant.restaurant_id : ""}.jpg`}
           alt={restaurant.restaurant_name}
         />
         <CardContent>

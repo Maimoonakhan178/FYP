@@ -27,7 +27,7 @@ const SignUpPage = () => {
     payload.append('password', formData.password);
   
     try {
-      const res = await fetch('http://127.0.0.1:5000/api/signup', {
+      const res = await fetch('https://c602-2400-adc1-4a9-a00-47a-8f89-7a8c-c33c.ngrok-free.app/api/signup', {
         method: 'POST',
         body:    payload
       });

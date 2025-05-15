@@ -14,12 +14,15 @@ import {
   Box,
   Grid,
   Chip,
-  Avatar
+  Avatar,
 } from "@mui/material";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import SentimentVeryDissatisfiedIcon from "@mui/icons-material/SentimentVeryDissatisfied";
 import SentimentSatisfiedIcon from "@mui/icons-material/SentimentSatisfied";
-
+const REST_IMG_BASE =
+  "https://c602-2400-adc1-4a9-a00-47a-8f89-7a8c-c33c.ngrok-free.app/media/res";
+const FALLBACK =
+  "https://via.placeholder.com/300x169?text=No+Image";
 const RecentActivity = () => {
   const [reviews, setReviews] = useState([]);
   const [selected, setSelected] = useState(null);
@@ -28,7 +31,10 @@ const RecentActivity = () => {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch("http://127.0.0.1:5000/api/recent", { method: "POST" });
+        const res = await fetch(
+          "https://c602-2400-adc1-4a9-a00-47a-8f89-7a8c-c33c.ngrok-free.app/api/recent",
+          { method: "POST" }
+        );
         const data = await res.json();
         setReviews(data.reviews ?? []);
       } catch (e) {
@@ -40,101 +46,113 @@ const RecentActivity = () => {
   const shown = showAll ? reviews : reviews.slice(0, 6);
 
   const getSentimentIcon = (s) =>
-    s === "POS"
-      ? <SentimentSatisfiedIcon color="success" />
-      : s === "NEG"
-      ? <SentimentVeryDissatisfiedIcon color="error" />
-      : <SentimentSatisfiedIcon color="disabled" />;
+    s === "POS" ? (
+      <SentimentSatisfiedIcon color="success" />
+    ) : s === "NEG" ? (
+      <SentimentVeryDissatisfiedIcon color="error" />
+    ) : (
+      <SentimentSatisfiedIcon color="disabled" />
+    );
 
   const formatDate = (ts) =>
     new Date(ts).toLocaleString("en-US", {
-      year: "numeric", month: "short", day: "numeric",
-      hour: "2-digit", minute: "2-digit"
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
 
   return (
     <Box sx={{ py: 6, backgroundColor: "#fafafa" }}>
-      <Typography variant="h4" align="center" gutterBottom sx={{ fontWeight: 700 }}>
+      <Typography
+        variant="h4"
+        align="center"
+        gutterBottom
+        sx={{ fontWeight: 700 }}
+      >
         Recent Restaurant Reviews
       </Typography>
 
       <Grid container spacing={4} justifyContent="center">
-        {shown.map((r) => (
-          <Grid
-            item
-            key={r.review_id}
-            sx={{ display: "flex", justifyContent: "center" }}
-          >
-            <Card
-              sx={{
-                width: 300,
-                height: 400,
-                display: "flex",
-                flexDirection: "column",
-                borderRadius: 2,
-                boxShadow: 2,
-                transition: "transform 0.2s, box-shadow 0.2s",
-                "&:hover": { boxShadow: 6, transform: "translateY(-6px)" }
-              }}
+        {shown.map((r) => {
+          // Determine image URL or fallback
+          const imgUrl = r.restaurant_id
+            ? `${REST_IMG_BASE}/${r.restaurant_id}.jpg`
+            : FALLBACK;
+          return (
+            <Grid
+              item
+              key={r.review_id}
+              sx={{ display: "flex", justifyContent: "center" }}
             >
-              <CardActionArea
-                sx={{ flexGrow: 1 }}
-                onClick={() => setSelected(r)}
+              <Card
+                sx={{
+                  width: 300,
+                  height: 400,
+                  display: "flex",
+                  flexDirection: "column",
+                  borderRadius: 2,
+                  boxShadow: 2,
+                  transition: "transform 0.2s, box-shadow 0.2s",
+                  "&:hover": { boxShadow: 6, transform: "translateY(-6px)" },
+                }}
               >
-                <CardMedia
-                  component="div"
-                  sx={{
-                    pt: "56.25%", // 16:9 ratio
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
-                    backgroundImage: r.restaurant_image
-                      ? `url(http://127.0.0.1:5000/api/${r.restaurant_image})`
-                      : `url('https://via.placeholder.com/300x169?text=No+Image')`
-                  }}
-                />
-                <CardContent sx={{ flexGrow: 1 }}>
-                  <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-                    <RestaurantIcon sx={{ color: "primary.main", mr: 1 }} />
-                    <Typography variant="subtitle1" noWrap>
-                      {r.restaurant_name}
-                    </Typography>
-                  </Box>
-                  <Typography
-                    variant="body2"
-                    sx={{ mb: 2, color: "#555" }}
-                  >
-                    {r.review_text.length > 100
-                      ? r.review_text.slice(0, 100) + "…"
-                      : r.review_text}
-                  </Typography>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center"
+                <CardActionArea
+                  sx={{ flexGrow: 1 }}
+                  onClick={() => setSelected(r)}
+                >
+                  <CardMedia
+                    component="img"
+                    src={`${REST_IMG_BASE}/${r.restaurant_id}.jpg`}
+                    alt={r.restaurant_name}
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = FALLBACK;
                     }}
-                  >
-                    <Chip
-                      icon={getSentimentIcon(r.overall_sentiment)}
-                      label={r.overall_sentiment}
-                      size="small"
-                      color={
-                        r.overall_sentiment === "POS"
-                          ? "success"
-                          : r.overall_sentiment === "NEG"
-                          ? "error"
-                          : "default"
-                      }
-                    />
-                    <Typography variant="caption" color="text.secondary">
-                      {formatDate(r.timestamp)}
+                    sx={{ width: "100%", height: 169, objectFit: "cover" }}
+                  />
+                  <CardContent sx={{ flexGrow: 1 }}>
+                    <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+                      <RestaurantIcon sx={{ color: "primary.main", mr: 1 }} />
+                      <Typography variant="subtitle1" noWrap>
+                        {r.restaurant_name}
+                      </Typography>
+                    </Box>
+                    <Typography variant="body2" sx={{ mb: 2, color: "#555" }}>
+                      {r.review_text.length > 100
+                        ? r.review_text.slice(0, 100) + "…"
+                        : r.review_text}
                     </Typography>
-                  </Box>
-                </CardContent>
-              </CardActionArea>
-            </Card>
-          </Grid>
-        ))}
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Chip
+                        icon={getSentimentIcon(r.overall_sentiment)}
+                        label={r.overall_sentiment}
+                        size="small"
+                        color={
+                          r.overall_sentiment === "POS"
+                            ? "success"
+                            : r.overall_sentiment === "NEG"
+                            ? "error"
+                            : "default"
+                        }
+                      />
+                      <Typography variant="caption" color="text.secondary">
+                        {formatDate(r.timestamp)}
+                      </Typography>
+                    </Box>
+                  </CardContent>
+                </CardActionArea>
+              </Card>
+            </Grid>
+          );
+        })}
       </Grid>
 
       {reviews.length > 6 && (
@@ -157,11 +175,7 @@ const RecentActivity = () => {
             <DialogContent dividers>
               <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                 <Avatar
-                  src={
-                    selected.restaurant_image
-                      ? `http://127.0.0.1:5000/api/${selected.restaurant_image}`
-                      : undefined
-                  }
+                  src={`https://c602-2400-adc1-4a9-a00-47a-8f89-7a8c-c33c.ngrok-free.app/media/res/${selected.restaurant_id}.jpg`}
                   sx={{ width: 56, height: 56, mr: 2 }}
                 >
                   <RestaurantIcon />
@@ -192,7 +206,10 @@ const RecentActivity = () => {
 
               <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
                 {selected.dish_id && (
-                  <Chip label={`Dish ID: ${selected.dish_id}`} variant="outlined" />
+                  <Chip
+                    label={`Dish ID: ${selected.dish_id}`}
+                    variant="outlined"
+                  />
                 )}
                 {selected.ambiance_score > 0 && (
                   <Chip
